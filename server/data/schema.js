@@ -38,7 +38,9 @@ const typeDefs = `
     }
 
     type Query {
-        getOneFamily(id: ID): Family
+        getAllFamilies: [Family]
+        getAllEvents: [Event]
+        getOneFamily(email: String): Family
         getOnePerson(id: ID): Person
         getOneEvent(id: ID): Event
     }

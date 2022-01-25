@@ -3,9 +3,12 @@ import { Families, People, Events } from './dbConnectors';
 // resolver map
 export const resolvers = { 
     Query: {
+        getAllFamilies: () => {
+            return Families.find({});
+        },
         getOneFamily: (root, { email }) => {
             return new Promise((resolve, object) => {
-                Families.find({ email: email }, (err, family) => {
+                Families.findOne({ email: email }, (err, family) => {
                     if (err) reject(err)
                     else resolve(family)
                 })
@@ -18,6 +21,9 @@ export const resolvers = {
                     else resolve(person)
                 })
             })
+        },
+        getAllEvents: () => {
+            return Events.find({});
         },
         getOneEvent: (root, { id }) => {
             return new Promise((resolve, object) => {
