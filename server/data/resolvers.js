@@ -4,34 +4,37 @@ import { Families, People, Events } from './dbConnectors';
 export const resolvers = { 
     Query: {
         getAllFamilies: () => {
-            return Families.find({}).populate('members');
+            return Families.find({}).populate({ path:'members', populate: { path: 'events' }});
         },
         getOneFamily: (root, { email }) => {
-            return Families.findOne({ email: email }, (err, family) => {
+            return Families.findOne({ email: email }, (err) => {
                 if (err) reject(err) 
             })
-                .populate('members');
+                .populate({ path:'members', populate: { path: 'events' }});
         },
         getFamilyById: (root, { id }) => {
-            return Families.findById(id, (err, family) => {
+            return Families.findById(id, (err) => {
                 if (err) reject(err)
             })
-                .populate('members');
+                .populate({ path:'members', populate: { path: 'events' }});
         },
         getAllPeople: () => {
-            return People.find({}).populate('family');
+            return People.find({})
+                .populate('family').populate('events');
         },
         getOnePerson: async (root, { id }) => {
             return People.findById(id, (err) => { if (err) reject(err) })
-                .populate('family'); 
+                .populate('family').populate('events');
         },
         getAllEvents: () => {
-            return Events.find({});
+            return Events.find({})
+                .populate({ path: 'attendees', populate: { path: 'family' }})
+                .populate({ path: 'family', populate: { path: 'members' }});
         },
         getOneEvent: (root, { id }) => {
-            return Events.findById(id, (err, event) => {
-                if (err) reject(err)
-            })    
+            return Events.findById(id, (err) => { if (err) reject(err) })
+                .populate({ path: 'attendees', populate: { path: 'family' }})
+                .populate({ path: 'family', populate: { path: 'members' }});  
         }
     },
     Mutation: {
@@ -92,6 +95,14 @@ export const resolvers = {
                 time: input.time
             });
 
+            const returnEvent = {
+                family: input.family,
+                owner: input.owner,
+                attendees: [],
+                date: input.date,
+                time: input.time
+            }
+
             newEvent.id = newEvent._id;           
 
             for (let i = 0; i < input.attendees.length; i++) {
@@ -102,12 +113,13 @@ export const resolvers = {
                     if (err) reject(err)
                 })
 
-                newEvent.attendees.push(person.id);   
+                newEvent.attendees.push(person.id);
+                returnEvent.attendees.push(person);   
             }
 
-            newEvent.save((err) => { if (err) reject(err) })
+            newEvent.save((err) => { if (err) reject(err) });
 
-            return newEvent;
+            return returnEvent;
         },
         updateEvent: (root, { input }) => {
             return Events.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err, event) => {
