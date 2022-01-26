@@ -83,31 +83,32 @@ export const resolvers = {
 
             return ('Successfully deleted person')
         },
-        // createEvent: (root, { input }) => {
-        //     const newEvent = new Events({
-        //         family: input.family,
-        //         owner: input.owner,
-        //         attendees: input.attendees,
-        //         date: input.date,
-        //         time: input.time
-        //     });
+        createEvent: async (root, { input }) => {
+            const newEvent = new Events({
+                family: input.family,
+                owner: input.owner,
+                attendees: [],
+                date: input.date,
+                time: input.time
+            });
 
-        //     newEvent.id = newEvent._id;
+            newEvent.id = newEvent._id;           
 
-        //     return newEvent.save((err) => {
-        //         if (err) reject(err)
-        //     })
+            for (let i = 0; i < input.attendees.length; i++) {
+                const person = await People.findById(input.attendees[i].id);
+                person.events.push(newEvent.id);
 
-        //     const person = await People.findById(newEvent.owner)
-        //     person.events.push(newEvent)
+                await People.updateOne({ _id: person.id }, person, { new: true }, (err, person) => {
+                    if (err) reject(err)
+                })
 
-        //     Events.updateOne({ _id: person.id }, person, { new: true }, (err, person) => {
-        //         if (err) reject(err)
-        //     })
+                newEvent.attendees.push(person.id);   
+            }
 
-        //     newEvent.owner = person
-        //     return newE
-        // },
+            newEvent.save((err) => { if (err) reject(err) })
+
+            return newEvent;
+        },
         updateEvent: (root, { input }) => {
             return Events.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err, event) => {
                 if (err) reject(err)

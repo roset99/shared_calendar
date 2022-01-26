@@ -16,15 +16,15 @@ const familySchema = new mongoose.Schema({
 const personSchema = new mongoose.Schema({
     name: { type: String },
     birthday: { type: String },
-    events: { type: Array },
+    events: [{ type: mongoose.Schema.Types.ObjectId, ref: 'events' }],
     colour: { type: String },
     family: { type: mongoose.Schema.Types.ObjectId, ref: 'families' }
 });
 
 const eventSchema = new mongoose.Schema({
-    family: { type: String },
-    owner: {type: String },
-    attendees: {type: Array },
+    family: { type: mongoose.Schema.Types.ObjectId, ref: 'families' },
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'people' },
+    attendees: [{ type: mongoose.Schema.Types.ObjectId, ref: 'people' }],
     date: {type: String},
     time: {type: String}
 });
