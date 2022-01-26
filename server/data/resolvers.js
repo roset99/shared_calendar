@@ -14,6 +14,14 @@ export const resolvers = {
                 })
             })
         },
+        // getFamilyById: (root, { id }) => {
+        //     return new Promise((resolve, object) => {
+        //         Families.findById(id, (err, family) => {
+        //             if (err) reject(err)
+        //             else resolve(family)
+        //         })
+        //     })
+        // },
         getOnePerson: (root, { id }) => {
             return new Promise((resolve, object) => {
                 People.findById(id, (err, person) => {
@@ -35,21 +43,31 @@ export const resolvers = {
         }
     },
     Mutation: {
-        createPerson: (root, { input }) => {
+        createPerson: async (root, { input }) => {
             const newPerson = new People({
                 name: input.name,
                 birthday: input.birthday,
                 events: input.events,
                 colour: input.colour,
-                family: input.family
+                family: input.family.id
             });
 
             newPerson.id = newPerson._id;
 
-            return new Promise((resolve, object) => {
+            new Promise((resolve, object) => {
                 newPerson.save((err) => {
                     if (err) reject(err)
                     else resolve(newPerson)
+                })
+            });
+
+            const family = await Families.findById(newPerson.family)
+            family.members.push(newPerson)
+
+            return new Promise(( resolve, object) => {
+                Families.updateOne({ _id: family.id }, family, { new: true }, (err, family) => {
+                    if (err) reject(err)
+                    else resolve(family)
                 })
             })
         },
@@ -87,7 +105,7 @@ export const resolvers = {
                 })
             })
         },
-        updateEvent: (root, { input}) => {
+        updateEvent: (root, { input }) => {
             return new Promise(( resolve, object) => {
                 Events.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err, event) => {
                     if (err) reject(err)
@@ -104,6 +122,8 @@ export const resolvers = {
             })
         },
         createFamily: (root, { input }) => {
+
+            
             const newFamily = new Families({
                 email: input.email,
                 password: input.password,
@@ -119,7 +139,7 @@ export const resolvers = {
                 })
             })
         },
-        updateFamily: (root, { input}) => {
+        updateFamily: (root, { input }) => {
             return new Promise(( resolve, object) => {
                 Families.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err, family) => {
                     if (err) reject(err)
