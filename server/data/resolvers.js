@@ -22,6 +22,9 @@ export const resolvers = {
         //         })
         //     })
         // },
+        getAllPeople: () => {
+            return People.find({});
+        },
         getOnePerson: (root, { id }) => {
             return new Promise((resolve, object) => {
                 People.findById(id, (err, person) => {
@@ -64,12 +67,15 @@ export const resolvers = {
             const family = await Families.findById(newPerson.family)
             family.members.push(newPerson)
 
-            return new Promise(( resolve, object) => {
+            new Promise(( resolve, object) => {
                 Families.updateOne({ _id: family.id }, family, { new: true }, (err, family) => {
                     if (err) reject(err)
                     else resolve(family)
                 })
             })
+
+            newPerson.family = family
+            return newPerson
         },
         updatePerson: (root, { input}) => {
             return new Promise(( resolve, object) => {
