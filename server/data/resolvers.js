@@ -7,42 +7,30 @@ export const resolvers = {
             return Families.find({});
         },
         getOneFamily: (root, { email }) => {
-            return new Promise((resolve, object) => {
-                Families.findOne({ email: email }, (err, family) => {
-                    if (err) reject(err)
-                    else resolve(family)
-                })
-            })
+            return Families.findOne({ email: email }, (err, family) => {
+                if (err) reject(err) 
+            });
         },
-        // getFamilyById: (root, { id }) => {
-        //     return new Promise((resolve, object) => {
-        //         Families.findById(id, (err, family) => {
-        //             if (err) reject(err)
-        //             else resolve(family)
-        //         })
-        //     })
-        // },
+        getFamilyById: (root, { id }) => {
+            return Families.findById(id, (err, family) => {
+                if (err) reject(err)
+            });
+        },
         getAllPeople: () => {
             return People.find({});
         },
         getOnePerson: (root, { id }) => {
-            return new Promise((resolve, object) => {
-                People.findById(id, (err, person) => {
-                    if (err) reject(err)
-                    else resolve(person)
-                })
+            return People.findById(id, (err, person) => {
+                if (err) reject(err)
             })
         },
         getAllEvents: () => {
             return Events.find({});
         },
         getOneEvent: (root, { id }) => {
-            return new Promise((resolve, object) => {
-                Events.findById(id, (err, event) => {
-                    if (err) reject(err)
-                    else resolve(event)
-                })
-            })
+            return Events.findById(id, (err, event) => {
+                if (err) reject(err)
+            })    
         }
     },
     Mutation: {
@@ -57,40 +45,29 @@ export const resolvers = {
 
             newPerson.id = newPerson._id;
 
-            new Promise((resolve, object) => {
-                newPerson.save((err) => {
-                    if (err) reject(err)
-                    else resolve(newPerson)
-                })
+            newPerson.save((err) => {
+                if (err) reject(err)
             });
 
             const family = await Families.findById(newPerson.family)
             family.members.push(newPerson)
 
-            new Promise(( resolve, object) => {
-                Families.updateOne({ _id: family.id }, family, { new: true }, (err, family) => {
-                    if (err) reject(err)
-                    else resolve(family)
-                })
+            Families.updateOne({ _id: family.id }, family, { new: true }, (err, family) => {
+                if (err) reject(err)
             })
 
             newPerson.family = family
             return newPerson
         },
         updatePerson: (root, { input}) => {
-            return new Promise(( resolve, object) => {
-                People.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err, person) => {
+            return  People.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err, person) => {
                     if (err) reject(err)
-                    else resolve(person)
-                })
             })
         },
         deletePerson: (root, { id }) => {
-            return new Promise(( resolve, object) => {
-                People.remove({ _id: id }, (err) => {
-                    if (err) reject(err)
-                    else resolve('Successfully deleted person')
-                })
+            People.remove({ _id: id }, (err) => {
+                if (err) reject(err)
+                else return ('Successfully deleted person')
             })
         },
         createEvent: (root, { input }) => {
@@ -104,32 +81,22 @@ export const resolvers = {
 
             newEvent.id = newEvent._id;
 
-            return new Promise((resolve, object) => {
-                newEvent.save((err) => {
-                    if (err) reject(err)
-                    else resolve(newEvent)
-                })
+            return newEvent.save((err) => {
+                if (err) reject(err)
             })
         },
         updateEvent: (root, { input }) => {
-            return new Promise(( resolve, object) => {
-                Events.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err, event) => {
-                    if (err) reject(err)
-                    else resolve(event)
-                })
+            return Events.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err, event) => {
+                if (err) reject(err)
             })
         },
         deleteEvent: (root, { id }) => {
-            return new Promise(( resolve, object) => {
-                Events.remove({ _id: id }, (err) => {
-                    if (err) reject(err)
-                    else resolve('Successfully deleted event')
-                })
+            Events.remove({ _id: id }, (err) => {
+                if (err) reject(err)
+                else return('Successfully deleted event')
             })
         },
         createFamily: (root, { input }) => {
-
-            
             const newFamily = new Families({
                 email: input.email,
                 password: input.password,
@@ -138,27 +105,19 @@ export const resolvers = {
 
             newFamily.id = newFamily._id;
 
-            return new Promise((resolve, object) => {
-                newFamily.save((err) => {
-                    if (err) reject(err)
-                    else resolve(newFamily)
-                })
+            return newFamily.save((err) => {
+                if (err) reject(err)
             })
         },
         updateFamily: (root, { input }) => {
-            return new Promise(( resolve, object) => {
-                Families.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err, family) => {
-                    if (err) reject(err)
-                    else resolve(family)
-                })
+            return Families.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err, family) => {
+                if (err) reject(err)  
             })
         },
         deleteFamily: (root, { id }) => {
-            return new Promise(( resolve, object) => {
-                Families.remove({ _id: id }, (err) => {
-                    if (err) reject(err)
-                    else resolve('Successfully deleted family')
-                })
+            Families.remove({ _id: id }, (err) => {
+                if (err) reject(err)
+                else return('Successfully deleted family')
             })
         }
     },
