@@ -4,33 +4,26 @@ import { Families, People, Events } from './dbConnectors';
 export const resolvers = { 
     Query: {
         getAllFamilies: () => {
-            return Families.find({});
+            return Families.find({}).populate('members');
         },
         getOneFamily: (root, { email }) => {
             return Families.findOne({ email: email }, (err, family) => {
                 if (err) reject(err) 
-            });
+            })
+                .populate('members');
         },
         getFamilyById: (root, { id }) => {
             return Families.findById(id, (err, family) => {
                 if (err) reject(err)
-            });
+            })
+                .populate('members');
         },
         getAllPeople: () => {
-            return People.find({});
+            return People.find({}).populate('family');
         },
         getOnePerson: async (root, { id }) => {
-            // const person = await People.findById(id, (err, person) => {
-            //     if (err) reject(err)
-            // })
-            // const family = await Families.findById(person.family, (err, family) => {
-            //     if (err) reject(err)
-            // });
-            // person.family = family
-            // console.log(person)
-            // return person
-
-            return People.findById(id, (err) => { if (err) reject(err) }).populate('family')    
+            return People.findById(id, (err) => { if (err) reject(err) })
+                .populate('family'); 
         },
         getAllEvents: () => {
             return Events.find({});
@@ -50,12 +43,10 @@ export const resolvers = {
                 colour: input.colour,
                 family: input.family.id
             });
-
+            
             newPerson.id = newPerson._id;
 
-            newPerson.save((err) => {
-                if (err) reject(err)
-            });
+            newPerson.save((err) => { if (err) reject(err) });
 
             const family = await Families.findById(newPerson.family)
             family.members.push(newPerson)
@@ -67,32 +58,56 @@ export const resolvers = {
             newPerson.family = family
             return newPerson
         },
-        updatePerson: (root, { input }) => {
-            return  People.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err, person) => {
-                    if (err) reject(err)
-            })
-        },
-        deletePerson: (root, { id }) => {
-            People.remove({ _id: id }, (err) => {
+        updatePerson: async (root, { input }) => {
+            await People.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err, person) => {
                 if (err) reject(err)
-                else return ('Successfully deleted person')
             })
+
+            return await People.findById(input.id, (err) => { if (err) reject(err) })
+                .populate('family'); 
         },
-        createEvent: (root, { input }) => {
-            const newEvent = new Events({
-                family: input.family,
-                owner: input.owner,
-                attendees: input.attendees,
-                date: input.date,
-                time: input.time
+        deletePerson: async (root, { id }) => {
+            const person = await People.findById(id, (err) => { 
+                if (err) reject(err) 
+            })
+
+            await People.deleteOne({ _id: id }, (err) => {
+                if (err) reject(err)
             });
 
-            newEvent.id = newEvent._id;
-
-            return newEvent.save((err) => {
+            const family = await Families.findById(person.family, (err) => {
                 if (err) reject(err)
-            })
+            });
+            family.members.pull(id);
+            family.save((err) => { if (err) reject(err) });
+
+            return ('Successfully deleted person')
         },
+        // createEvent: (root, { input }) => {
+        //     const newEvent = new Events({
+        //         family: input.family,
+        //         owner: input.owner,
+        //         attendees: input.attendees,
+        //         date: input.date,
+        //         time: input.time
+        //     });
+
+        //     newEvent.id = newEvent._id;
+
+        //     return newEvent.save((err) => {
+        //         if (err) reject(err)
+        //     })
+
+        //     const person = await People.findById(newEvent.owner)
+        //     person.events.push(newEvent)
+
+        //     Events.updateOne({ _id: person.id }, person, { new: true }, (err, person) => {
+        //         if (err) reject(err)
+        //     })
+
+        //     newEvent.owner = person
+        //     return newE
+        // },
         updateEvent: (root, { input }) => {
             return Events.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err, event) => {
                 if (err) reject(err)
