@@ -19,10 +19,18 @@ export const resolvers = {
         getAllPeople: () => {
             return People.find({});
         },
-        getOnePerson: (root, { id }) => {
-            return People.findById(id, (err, person) => {
-                if (err) reject(err)
-            })
+        getOnePerson: async (root, { id }) => {
+            // const person = await People.findById(id, (err, person) => {
+            //     if (err) reject(err)
+            // })
+            // const family = await Families.findById(person.family, (err, family) => {
+            //     if (err) reject(err)
+            // });
+            // person.family = family
+            // console.log(person)
+            // return person
+
+            return People.findById(id, (err) => { if (err) reject(err) }).populate('family')    
         },
         getAllEvents: () => {
             return Events.find({});
@@ -59,7 +67,7 @@ export const resolvers = {
             newPerson.family = family
             return newPerson
         },
-        updatePerson: (root, { input}) => {
+        updatePerson: (root, { input }) => {
             return  People.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err, person) => {
                     if (err) reject(err)
             })
