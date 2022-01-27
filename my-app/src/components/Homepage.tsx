@@ -7,6 +7,7 @@ function Homepage(): JSX.Element {
     <h1 id="hp-header">SHARED CALENDAR</h1>
     <Link className="hp-signup" to="signup">Sign Up</Link>
     <Link className="hp-login" to="/login">Login</Link>
+    <Link className="hp-events" to="/events">Events placeholder</Link>
     </section>
   );
 }
