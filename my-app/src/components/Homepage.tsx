@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom'
 
-function Homepage() {
+function Homepage(): JSX.Element {
   return (
     <section id="hp">
     <h1 id="hp-header">SHARED CALENDAR</h1>

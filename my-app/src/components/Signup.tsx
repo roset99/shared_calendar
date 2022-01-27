@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-function SignUp() {
+function SignUp(): JSX.Element {
         return (  
             <>
                 <form className="signup">
