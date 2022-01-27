@@ -7,7 +7,6 @@ function SignUp() {
                 <form className="signup">
                     <h1>Sign up</h1>
                     <p>Please fill out this form to create an account.</p>
-                    <hr />
                     <label htmlFor="name">Name</label>
                     <input id="name" type="text" />
 
@@ -16,6 +15,7 @@ function SignUp() {
 
                     <label htmlFor="colour">Favourite Colour</label>
                     <select id="colour">
+                        <option value="" disabled>Select a colour</option>
                         <option value="">1</option>
                         <option value="">2</option>
                         <option value="">3</option>
