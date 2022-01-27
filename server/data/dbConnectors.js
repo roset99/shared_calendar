@@ -10,7 +10,8 @@ mongoose.connect('mongodb://localhost/calendar', {
 const familySchema = new mongoose.Schema({
     email: { type: String },
     password: { type: String },
-    members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'people' }]
+    members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'people' }],
+    events: [{ type: mongoose.Schema.Types.ObjectId, ref: 'events' }]
 });
 
 const personSchema = new mongoose.Schema({
@@ -25,8 +26,8 @@ const eventSchema = new mongoose.Schema({
     family: { type: mongoose.Schema.Types.ObjectId, ref: 'families' },
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'people' },
     attendees: [{ type: mongoose.Schema.Types.ObjectId, ref: 'people' }],
-    date: {type: String},
-    time: {type: String}
+    date: { type: String },
+    time: { type: String }
 });
 
 const Families = mongoose.model('families', familySchema);

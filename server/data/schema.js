@@ -25,6 +25,7 @@ const typeDefs = `
         email: String
         password: String
         members: [Person]
+        events: [Event]
     }
 
     enum Colour {
@@ -61,6 +62,7 @@ const typeDefs = `
         email: String
         password: String
         members: [PersonInput]
+        events: [EventInput]
     }
     
     input EventInput {
@@ -68,6 +70,12 @@ const typeDefs = `
         family: FamilyInput
         owner: PersonInput
         attendees: [PersonInput]
+        date: String
+        time: String
+    }
+
+    input UpdateEventInput {
+        id: ID
         date: String
         time: String
     }
@@ -80,7 +88,7 @@ const typeDefs = `
         updatePerson(input: PersonInput): Person
         deletePerson(id: ID!): String
         createEvent(input: EventInput): Event
-        updateEvent(input: EventInput): Event
+        updateEvent(input: UpdateEventInput): Event
         deleteEvent(id: ID!): String
     }
 `;
