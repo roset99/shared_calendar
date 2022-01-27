@@ -25,6 +25,7 @@ const typeDefs = `
         email: String
         password: String
         members: [Person]
+        events: [Event]
     }
 
     enum Colour {
@@ -32,39 +33,49 @@ const typeDefs = `
         ffd6a5
         fdffb6
         caffbf
-        9bf6ff
         a0c4ff
         bdb2ff
         ffc6ff
     }
 
     type Query {
-        getOneFamily(id: ID): Family
+        getAllFamilies: [Family]
+        getAllEvents: [Event]
+        getAllPeople: [Person]
+        getOneFamily(email: String): Family
         getOnePerson(id: ID): Person
         getOneEvent(id: ID): Event
+        getFamilyById(id: ID): Family
     }
 
     input PersonInput {
         id: ID
         name: String
         birthday: String
-        events: [Event]
+        events: [EventInput]
         colour: Colour
-        family: Family
+        family: FamilyInput
     }
 
     input FamilyInput {
         id: ID
         email: String
         password: String
-        members: [Person]
+        members: [PersonInput]
+        events: [EventInput]
     }
     
     input EventInput {
         id: ID
-        family: Family
-        owner: Person
-        attendees: [Person]
+        family: FamilyInput
+        owner: PersonInput
+        attendees: [PersonInput]
+        date: String
+        time: String
+    }
+
+    input UpdateEventInput {
+        id: ID
         date: String
         time: String
     }
@@ -77,7 +88,7 @@ const typeDefs = `
         updatePerson(input: PersonInput): Person
         deletePerson(id: ID!): String
         createEvent(input: EventInput): Event
-        updateEvent(input: EventInput): Event
+        updateEvent(input: UpdateEventInput): Event
         deleteEvent(id: ID!): String
     }
 `;
