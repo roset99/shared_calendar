@@ -1,7 +1,8 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import MonthDayComponent from './MonthDayComponent';
-import './MonthlyCalendar.css'
+import './MonthlyCalendar.css';
+import {Link} from 'react-router-dom';
 
 const MonthlyCalendar = (): any => {
     
@@ -76,7 +77,7 @@ const MonthlyCalendar = (): any => {
     }, [])
 
     const monthDayComponents = daysInMonth.map((index) => {
-        return <MonthDayComponent day={index} month={month} year={year} key={index}/>
+        return <Link className="days-of-month" to="/days"><MonthDayComponent day={index} month={month} year={year} key={index}/></Link>
                  
     });
 
