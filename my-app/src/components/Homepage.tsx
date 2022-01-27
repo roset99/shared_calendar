@@ -1,7 +1,13 @@
 import React from 'react';
+import MonthlyCalendar from './MonthlyCalendar';
 
 function Homepage() {
-  return <div>Hello, how are you</div>;
+  return (
+    <div>
+      <MonthlyCalendar/>
+    </div>
+  
+  );
 }
 
 export default Homepage;

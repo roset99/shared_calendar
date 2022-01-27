@@ -1,0 +1,57 @@
+.month-calendar {
+  background-color: #fec89a;
+}
+
+.title {
+  display: flex;
+  justify-content: center;
+  width: 85%;
+  margin: auto;
+}
+
+.month-day-components {
+  width: 85%;
+  margin: auto;
+  margin-top: 2em;
+  background-color: #ffe5d9;
+  border-radius: 2em;
+  border: 5px solid #e76f51;
+}
+
+.right-button {
+  height: 60px;
+  width: 100px;
+}
+
+.right-button:before {
+  content: "";
+  width: 25px;
+  height: 2px;
+  background: slategray;
+  margin-top: -1px;
+  transition: all 0.3s ease;
+}
+
+.right-button:hover:before {
+  right: 34px;
+  width: 35px;
+}
+
+.right-button:after {
+  content: "";
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-color: transparent transparent transparent #000000;
+  position: absolute;
+  top: 50%;
+  margin-top: -5px;
+  right: 20px;
+  transition: all 0.3s ease;
+}
+
+.right-button:hover:after {
+  right: 34px;
+  right: 30px;
+}

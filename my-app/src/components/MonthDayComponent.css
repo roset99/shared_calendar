@@ -1,0 +1,23 @@
+.month-day {
+  display: grid;
+  grid-template-columns: 12% 22% 22% 22% 22%;
+  color: red;
+  width: 100%;
+  margin: auto;
+  border-bottom: 3px #f8edeb solid;
+}
+.member {
+  width: 85%;
+  margin: auto;
+  padding: auto;
+  text-align: center;
+}
+.date {
+  color: #001219;
+  border-right: 3px solid #f8edeb;
+  margin: auto;
+  height: 100%;
+  padding: 1em;
+  width: 100%;
+  text-align: center;
+}
