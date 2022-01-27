@@ -76,16 +76,16 @@ const MonthlyCalendar = (): any => {
     }, [])
 
     const monthDayComponents = daysInMonth.map((index) => {
-        return <MonthDayComponent day={index} key={index}/>
+        return <MonthDayComponent day={index} month={month} year={year} key={index}/>
                  
     });
 
     return (
         <div className="month-calendar">
             <div className="title">
-                <button onClick={() => decreaseMonth()} className="left-button"></button>
+                <button onClick={() => decreaseMonth()} className="button left-button"><i className="arrow left"></i></button>
                 <h1>{title()}</h1>
-                <button onClick={() => increaseMonth()} className = "right-button"></button>
+                <button onClick={() => increaseMonth()} className = "button right-button"><i className="arrow right"></i></button>
             </div>
             <div className="month-day-components">
                 {monthDayComponents}

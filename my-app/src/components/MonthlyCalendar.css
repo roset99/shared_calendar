@@ -18,40 +18,23 @@
   border: 5px solid #e76f51;
 }
 
-.right-button {
-  height: 60px;
-  width: 100px;
+.button {
+  background-color: transparent;
+  border: none;
+}
+.arrow {
+  border: solid black;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
 }
 
-.right-button:before {
-  content: "";
-  width: 25px;
-  height: 2px;
-  background: slategray;
-  margin-top: -1px;
-  transition: all 0.3s ease;
+.right {
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
 }
 
-.right-button:hover:before {
-  right: 34px;
-  width: 35px;
-}
-
-.right-button:after {
-  content: "";
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 5px 0 5px 5px;
-  border-color: transparent transparent transparent #000000;
-  position: absolute;
-  top: 50%;
-  margin-top: -5px;
-  right: 20px;
-  transition: all 0.3s ease;
-}
-
-.right-button:hover:after {
-  right: 34px;
-  right: 30px;
+.left {
+  transform: rotate(135deg);
+  -webkit-transform: rotate(135deg);
 }
