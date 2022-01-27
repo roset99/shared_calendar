@@ -26,8 +26,8 @@ const eventSchema = new mongoose.Schema({
     family: { type: mongoose.Schema.Types.ObjectId, ref: 'families' },
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'people' },
     attendees: [{ type: mongoose.Schema.Types.ObjectId, ref: 'people' }],
-    date: {type: String},
-    time: {type: String}
+    date: { type: String },
+    time: { type: String }
 });
 
 const Families = mongoose.model('families', familySchema);

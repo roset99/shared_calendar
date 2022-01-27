@@ -183,20 +183,27 @@ export const resolvers = {
 
             newFamily.id = newFamily._id;
 
-            return newFamily.save((err) => {
-                if (err) reject(err)
-            })
+            newFamily.save((err) => {});
+            return newFamily
         },
         updateFamily: (root, { input }) => {
-            return Families.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err, family) => {
-                if (err) reject(err)  
-            })
+            return Families.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err) => {}) 
         },
-        deleteFamily: (root, { id }) => {
-            Families.remove({ _id: id }, (err) => {
-                if (err) reject(err)
-                else return('Successfully deleted family')
-            })
+        deleteFamily: async (root, { id }) => {
+            const family = await Families.findById(id);
+
+            for (let i=0; i < family.members.length; i++){
+                const member = await People.findById(family.members[i]);
+                await People.deleteOne({ _id: member.id })
+            }
+        
+            for (let i=0; i < family.events.length; i++){
+                const event = await Events.findById(family.events[i]);
+                await Events.deleteOne({ _id: event.id })
+            }
+            
+            await Families.deleteOne({ _id: id });
+            return ('Succesfully deleted family')
         }
     },
 };
