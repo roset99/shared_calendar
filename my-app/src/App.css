@@ -36,3 +36,41 @@
     transform: rotate(360deg);
   }
 }
+
+/* ------------------------------------------------------------ */
+/* Sign up page */
+
+.signup {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 2rem;
+}
+
+.signup > h1,
+.signup > p {
+  text-align: center;
+  margin: 0.2rem;
+}
+
+label {
+  margin-bottom: 0.2rem;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="password"],
+select
+{
+  padding: 0.2rem;
+  margin-bottom: 1rem;
+}
+
+.signupbtn {
+  padding: 0.5rem 0;
+  width: 30%;
+  align-self: center;
+  border-radius: 2rem;
+  background: #fff;
+  border: 1px solid #777;
+}
