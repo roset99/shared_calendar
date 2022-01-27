@@ -10,7 +10,8 @@ mongoose.connect('mongodb://localhost/calendar', {
 const familySchema = new mongoose.Schema({
     email: { type: String },
     password: { type: String },
-    members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'people' }]
+    members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'people' }],
+    events: [{ type: mongoose.Schema.Types.ObjectId, ref: 'events' }]
 });
 
 const personSchema = new mongoose.Schema({

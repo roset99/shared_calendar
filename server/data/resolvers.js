@@ -78,9 +78,7 @@ export const resolvers = {
                 if (err) reject(err)
             });
 
-            const family = await Families.findById(person.family, (err) => {
-                if (err) reject(err)
-            });
+            const family = await Families.findById(person.family, (err) => {});
             family.members.pull(id);
             family.save((err) => { if (err) reject(err) });
 
@@ -121,16 +119,60 @@ export const resolvers = {
 
             return returnEvent;
         },
-        updateEvent: (root, { input }) => {
-            return Events.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err, event) => {
-                if (err) reject(err)
-            })
+        updateEvent: async (root, { input }) => {
+            // const oldEvent = await Events.findOneAndUpdate({ _id: input.id }, input, { new: false }, () => {});
+            // const newEvent = await Events.findById(input.id, (err) => {});
+
+            // const oldEvent = await Events.findById(input.id);
+            await Events.findOneAndUpdate({ _id: input.id }, input);
+            // const newEvent = await Events.findById(input.id);
+            // const newEvent = await Events.findOneAndUpdate({ _id: input.id }, input, { new: true }, () => {});
+          
+
+            // get person and push updated event to their events list
+            // for (let i=0; i < newEvent.attendees.length; i++) {
+
+            //     // if person added to event
+            //     const person = await People.findById(newEvent.attendees[i]);
+                
+            //     if (!person.events.includes(newEvent.id)) {
+            //         person.events.push(newEvent.id)
+            //         await People.updateOne({ _id: person.id }, person, { new: true }, () => {}) 
+            //     }
+            // }
+
+            // for (let i=0; i < oldEvent.attendees.length; i++){
+            //     // if newEvent !includes attendee, remove attendee 
+            //     if (!newEvent.attendees.includes(oldEvent.attendees[i])) {
+            //         const person = await People.findById(oldEvent.attendees[i])
+            //         person.events.pull(oldEvent.id) // remove oldEvent from person's events array
+            //         person.save()
+            //     }
+            // }
+           
+            return await Events.findById(input.id, () => {})
+                .populate({ path: 'attendees', populate: { path: 'family' }})
+                .populate({ path: 'family', populate: { path: 'members' }});    
         },
-        deleteEvent: (root, { id }) => {
-            Events.remove({ _id: id }, (err) => {
-                if (err) reject(err)
-                else return('Successfully deleted event')
-            })
+        deleteEvent: async (root, { id }) => {
+            const event = await Events.findById(id, () => {});            
+            
+            await Events.deleteOne({ _id: id }, () => {});
+
+            const family = await Families.findById(event.family, () => {});
+            family.events.pull(id);
+            family.save();
+
+            // remove from person.events
+            for (let i = 0; i < event.attendees.length; i++) {
+                const person = await People.findById(event.attendees[i], () => {});
+
+                person.events.pull(event.id);
+
+                await People.updateOne({ _id: person.id }, person, { new: true }, () => {})
+            } 
+            
+            return ('Successfully deleted event');
         },
         createFamily: (root, { input }) => {
             const newFamily = new Families({
