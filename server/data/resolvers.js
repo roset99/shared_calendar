@@ -1,6 +1,7 @@
 import { Families, People, Events } from './dbConnectors';
 
 // resolver map
+
 export const resolvers = { 
     Query: {
         getAllFamilies: () => {
@@ -10,13 +11,14 @@ export const resolvers = {
             return Families.findOne({ email: email }, (err) => {
                 if (err) reject(err) 
             })
-                .populate({ path:'members', populate: { path: 'events' }});
+                .populate({ path:'members', populate: { path: 'events' }})
+                .populate({ path: 'events', populate: {path: 'attendees'}});
         },
         getFamilyById: (root, { id }) => {
-            return Families.findById(id, (err) => {
-                if (err) reject(err)
-            })
-                .populate({ path:'members', populate: { path: 'events' }});
+            return Families.findById(id)
+                .populate({ path:'members', populate: { path: 'events' }})
+                .populate({ path: 'events', populate: {path: 'attendees'}})
+                .catch((error) => {console.log("error!")})
         },
         getAllPeople: () => {
             return People.find({})
@@ -35,7 +37,11 @@ export const resolvers = {
             return Events.findById(id, (err) => { if (err) reject(err) })
                 .populate({ path: 'attendees', populate: { path: 'family' }})
                 .populate({ path: 'family', populate: { path: 'members' }});  
-        }
+        },
+        getEventsByFamily:  (root, { family }) => {
+            return Events.find({family: family.id})
+            .catch((error) => {console.log("error!")});
+        },
     },
     Mutation: {
         createPerson: async (root, { input }) => {
@@ -86,7 +92,7 @@ export const resolvers = {
         },
         createEvent: async (root, { input }) => {
             const newEvent = new Events({
-                family: input.family,
+                family: input.family.id,
                 owner: input.owner,
                 attendees: [],
                 date: input.date,
@@ -94,7 +100,7 @@ export const resolvers = {
             });
 
             const returnEvent = {
-                family: input.family,
+                family: input.family.id,
                 owner: input.owner,
                 attendees: [],
                 date: input.date,
@@ -102,6 +108,8 @@ export const resolvers = {
             }
 
             newEvent.id = newEvent._id;           
+
+            
 
             for (let i = 0; i < input.attendees.length; i++) {
                 const person = await People.findById(input.attendees[i].id);
@@ -116,6 +124,15 @@ export const resolvers = {
             }
 
             newEvent.save((err) => { if (err) reject(err) });
+            
+            const family = await Families.findById(newEvent.family)
+            family.events.push(newEvent)
+
+            Families.updateOne({ _id: family.id }, family, { new: true }, (err, family) => {
+                if (err) reject(err)
+            })
+
+            newEvent.family = family
 
             return returnEvent;
         },
