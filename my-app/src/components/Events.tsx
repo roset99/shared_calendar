@@ -42,7 +42,7 @@ const Events: any = () => {
                   time: newEvent.time
               }
           } 
-      });
+      }).then(result => console.log(result))
     }
 
     return (
