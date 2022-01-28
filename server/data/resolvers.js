@@ -8,39 +8,44 @@ export const resolvers = {
             return Families.find({}).populate({ path:'members', populate: { path: 'events' }});
         },
         getOneFamily: (root, { email }) => {
-            return Families.findOne({ email: email }, (err) => {
-                if (err) reject(err) 
-            })
+            return Families.findOne({ email: email })
                 .populate({ path:'members', populate: { path: 'events' }})
-                .populate({ path: 'events', populate: {path: 'attendees'}});
+                .populate({ path: 'events', populate: {path: 'attendees'}})
+                .catch((error) => {console.log("error! Get Request failed" + error.message)});
         },
         getFamilyById: (root, { id }) => {
             return Families.findById(id)
                 .populate({ path:'members', populate: { path: 'events' }})
                 .populate({ path: 'events', populate: {path: 'attendees'}})
-                .catch((error) => {console.log("error!")})
+                .catch((error) => {console.log("error! Get Request failed" + error.message)});
         },
         getAllPeople: () => {
             return People.find({})
-                .populate('family').populate('events');
+                .populate('family').populate('events')
+                .catch((error) => {console.log("error! Get Request failed" + error.message)});
         },
         getOnePerson: async (root, { id }) => {
-            return People.findById(id, (err) => { if (err) reject(err) })
-                .populate('family').populate('events');
+            return People.findById(id)
+                .populate('family').populate('events')
+                .catch((error) => {console.log("error! Get Request failed" + error.message)});
         },
         getAllEvents: () => {
             return Events.find({})
                 .populate({ path: 'attendees', populate: { path: 'family' }})
-                .populate({ path: 'family', populate: { path: 'members' }});
+                .populate({ path: 'family', populate: { path: 'members' }})
+                .catch((error) => {console.log("error! Get Request failed" + error.message)});
         },
         getOneEvent: (root, { id }) => {
-            return Events.findById(id, (err) => { if (err) reject(err) })
+            return Events.findById(id)
                 .populate({ path: 'attendees', populate: { path: 'family' }})
-                .populate({ path: 'family', populate: { path: 'members' }});  
+                .populate({ path: 'family', populate: { path: 'members' }})
+                .catch((error) => {console.log("error! Get Request failed" + error.message)});  
         },
         getEventsByFamily:  (root, { family }) => {
             return Events.find({family: family.id})
-            .catch((error) => {console.log("error!")});
+            .populate({ path: 'attendees', populate: { path: 'family' }})
+            .populate({ path: 'family', populate: { path: 'members' }})
+            .catch((error) => {console.log("error! Get Request failed" + error.message)});
         },
     },
     Mutation: {
@@ -93,7 +98,6 @@ export const resolvers = {
         createEvent: async (root, { input }) => {
             const newEvent = new Events({
                 family: input.family.id,
-                owner: input.owner,
                 attendees: [],
                 date: input.date,
                 time: input.time
@@ -104,7 +108,6 @@ export const resolvers = {
             const returnEvent = {
                 id: newEvent.id,
                 family: input.family.id,
-                owner: input.owner,
                 attendees: [],
                 date: input.date,
                 time: input.time
