@@ -11,6 +11,7 @@ function Homepage(): JSX.Element {
       <Link className="hp-signup" to="/signup">Sign Up</Link>
       <Link className="hp-login" to="/login">Login</Link>
       <Link className="hp-events" to="/events">Events placeholder</Link> 
+      <Link className="month-calendar" to="/month-calendar">Calendar Placeholder</Link>
     </section>
   );
 }
