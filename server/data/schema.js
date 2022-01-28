@@ -14,7 +14,6 @@ const typeDefs = `
     type Event {
         id: ID
         family: Family
-        owner: Person
         attendees: [Person]
         date: String
         time: String
@@ -69,7 +68,6 @@ const typeDefs = `
     input EventInput {
         id: ID
         family: FamilyInput
-        owner: PersonInput
         attendees: [PersonInput]
         date: String
         time: String
