@@ -43,6 +43,8 @@ export const resolvers = {
         },
         getEventsByFamily:  (root, { family }) => {
             return Events.find({family: family.id})
+            .populate({ path: 'attendees', populate: { path: 'family' }})
+            .populate({ path: 'family', populate: { path: 'members' }})
             .catch((error) => {console.log("error! Get Request failed" + error.message)});
         },
     },
