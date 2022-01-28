@@ -5,6 +5,7 @@ import './MonthlyCalendar.css';
 import {Link} from 'react-router-dom';
 import {gql, useQuery} from '@apollo/client';
 
+
 const GET_EVENTS = gql`
 query{
     getEventsByFamily (family: {id: "61f3c4912f44ea46c45ef30b"}){
@@ -32,7 +33,6 @@ query{
 
 const MonthlyCalendar = (): any => {
     
-
     const [month, setMonth] = useState<number>(0);
     const [year, setYear] = useState<number>(0);
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
@@ -70,8 +70,6 @@ const MonthlyCalendar = (): any => {
         
     }
 
-    
-
     const decreaseMonth = () => {
         if (month === 0) {
             const newMonthIndex = 11;
@@ -98,12 +96,15 @@ const MonthlyCalendar = (): any => {
         setDaysInMonth(array);
         return array;
     }
-    
+
+
 
     const title = () => {
         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         return months[month] + " " + year;
     }
+
+
 
     
 
@@ -142,6 +143,7 @@ const MonthlyCalendar = (): any => {
     if (loading) return <h1>loading...</h1>;
     else if (error) return <h1>Error! {error.message}</h1>;
     else { return (
+
         <div className="month-calendar">
             <div className="title">
                 <button onClick={() => decreaseMonth()} className="button left-button"><i className="arrow left"></i></button>

@@ -103,16 +103,15 @@ export const resolvers = {
                 time: input.time
             });
 
+            newEvent.id = newEvent._id;           
+
             const returnEvent = {
+                id: newEvent.id,
                 family: input.family.id,
                 attendees: [],
                 date: input.date,
                 time: input.time
             }
-
-            newEvent.id = newEvent._id;           
-
-            
 
             for (let i = 0; i < input.attendees.length; i++) {
                 const person = await People.findById(input.attendees[i].id);
