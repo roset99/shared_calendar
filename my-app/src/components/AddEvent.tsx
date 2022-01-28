@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import { EventInputInterface } from './Interfaces';
 
 interface Props {
@@ -7,7 +8,7 @@ interface Props {
     onClose: () => void;
 
     // to do with handling add event
-    handleAddEvent: (e: React.FormEvent) => void;
+    handleAddEvent: (e: React.FormEvent, newEvent: EventInputInterface) => void;
     event: string;
     setEvent: React.Dispatch<React.SetStateAction<string>>;
 
@@ -21,11 +22,24 @@ const AddEvent: React.FC<Props> = ({show, onClose, handleAddEvent, event, setEve
     const [date, setDate] = useState<string>("");
     const [time, setTime] = useState<string>("");
     const [attendees, setAttendees] = useState<[]>([]);
-    
+
     if(!show) { return null; }
 
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        const newEvent: EventInputInterface = {
+            family: { id: "61f2dae90357581390862808" },
+            attendees: [],
+            date: date,
+            time: time
+        }
+
+        handleAddEvent(e, newEvent);
+    }
+
     return(
-        <form className="event" onSubmit={(e) => handleAddEvent(e)} >
+        <form className="event" onSubmit={(e) => handleSubmit(e)} >
             <button type="button" onClick={onClose}>X</button>
             <h1>Add Event</h1>
             

@@ -1,26 +1,49 @@
 import React, { useState } from 'react';
+import { gql, useMutation } from '@apollo/client';
+
 import AddEvent from './AddEvent'
 import { EventsList } from './EventsList';
-import { EventInterface } from './Interfaces';
+import { EventInputInterface, EventInterface } from './Interfaces';
 
+const CREATE_EVENT = gql`
+    mutation CreateEvent($input: EventInput) {
+        createEvent(input: $input) {
+            id
+        }
+    }
+`;
 
-function Events(): JSX.Element {
+const Events: any = () => {
     const [event, setEvent] = useState<string>("");
     const [events, setEvents] = useState<EventInterface[]>([]);
 
     const [show, setShow] = useState(false);
 
+    const [createEvent, { data, loading, error }] = useMutation(CREATE_EVENT);
+
+    if (loading) return 'Submitting...';
+    if (error) return `Submission error! ${error.message}`;
+
     //Used later when trying to submit form
-    const handleAddEvent = (e: React.FormEvent) => {
+    const handleAddEvent = (e: React.FormEvent, newEvent: EventInputInterface) => {
         e.preventDefault();
 
-        if(event) {
-            setEvents([...events,{title:event, isCompleted: false}]);
-            setEvent("");
-        }
-    }
+        // if(event) {
+        //     setEvents([...events,{title:event, isCompleted: false}]);
+        //     setEvent("");
+        // }
 
-    console.log(events);
+        createEvent({ 
+          variables: {
+              input: { 
+                  family: newEvent.family,
+                  attendees: newEvent.attendees,
+                  date: newEvent.date,
+                  time: newEvent.time
+              }
+          } 
+      });
+    }
 
     return (
       <>
