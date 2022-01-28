@@ -1,25 +1,23 @@
 import React from 'react';
+import { EventsInterface } from './Interfaces';
 
 interface Props {
-    show: boolean;
-    onClose: () => void;
-    handleAddEvent: (e: React.FormEvent) => void;
+    event: EventsInterface;
+    events: EventsInterface[];
+    setEvents: React.Dispatch<React.SetStateAction<EventsInterface[]>>
 }
 
-const Event = ({show, onClose, handleAddEvent}: Props) => {
-    if(!show) {
-        return null;
-    }
+const Event: React.FC<Props> = ({event, events, setEvents}) => {
+  return <form>
+      {event.title}
 
-    return(
-        <form onSubmit={(e) => handleAddEvent(e)} className="event">
-            <button onClick={onClose}>X</button>
-        <h1>Add Event</h1>
-        <p>This is a placeholder</p>
-        <input type="text" />
-        <button type="submit">Submit</button>
-        </form>
-    )
-}
+    {/* {possible buttons} */}
+      <section>
+        <span className="">edit</span>
+        <span className="">delete</span>
+        <span className="">complete</span>
+      </section>
+    </form>;
+};
 
 export default Event;
