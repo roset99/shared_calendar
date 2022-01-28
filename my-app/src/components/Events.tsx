@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import Event from './AddEvent'
+import AddEvent from './AddEvent'
 import { EventsList } from './EventsList';
-import { EventsInterface } from './Interfaces';
+import { EventInterface } from './Interfaces';
 
 
 function Events(): JSX.Element {
     const [event, setEvent] = useState<string>("");
-    const [events, setEvents] = useState<EventsInterface[]>([]);
+    const [events, setEvents] = useState<EventInterface[]>([]);
 
     const [show, setShow] = useState(false);
 
@@ -22,13 +22,13 @@ function Events(): JSX.Element {
 
     console.log(events);
 
-  return (
+    return (
       <>
-      <button onClick={() => setShow(true)}>Add an Event</button>
-      <Event event={event} setEvent={setEvent} handleAddEvent={handleAddEvent} onClose={() => {setShow(false)}} show={show} />
-      <EventsList events={events} setEvents={setEvents} />
+        <button onClick={() => setShow(true)}>Add an Event</button>
+        <AddEvent event={event} setEvent={setEvent} handleAddEvent={handleAddEvent} onClose={() => {setShow(false)}} show={show} family={{}} members={[]}/>
+        <EventsList events={events} setEvents={setEvents} />
       </>
-  )
+    )
 }
 
 export default Events;

@@ -1,10 +1,10 @@
 import React from 'react';
-import { EventsInterface } from './Interfaces';
+import { EventInterface } from './Interfaces';
 
 interface Props {
-    event: EventsInterface;
-    events: EventsInterface[];
-    setEvents: React.Dispatch<React.SetStateAction<EventsInterface[]>>
+    event: EventInterface;
+    events: EventInterface[];
+    setEvents: React.Dispatch<React.SetStateAction<EventInterface[]>>
 }
 
 const Event: React.FC<Props> = ({event, events, setEvents}) => {

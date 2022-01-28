@@ -1,9 +1,9 @@
 import React from 'react';
-import {EventsInterface} from './Interfaces';
+import { EventInterface } from './Interfaces';
 import Event from './Event';
 
 interface Props {
-    events: EventsInterface[];
+    events: EventInterface[];
     setEvents: any;
 }
 

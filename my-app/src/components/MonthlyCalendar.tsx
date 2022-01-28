@@ -2,8 +2,8 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import MonthDayComponent from './MonthDayComponent';
 import './MonthlyCalendar.css';
-import {Link} from 'react-router-dom';
-import {gql useQuery} from '@apollo/client';
+import { Link } from 'react-router-dom';
+import { gql, useQuery } from '@apollo/client';
 
 const GET_EVENTS = gql`
 query GetAllEvents {
@@ -19,11 +19,21 @@ query GetAllEvents {
 
 const MonthlyCalendar = (): any => {
     
-
     const [month, setMonth] = useState<number>(0);
     const [year, setYear] = useState<number>(0);
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
     const { loading, error, data } = useQuery(GET_EVENTS);
+
+    useEffect(() => {
+        allDaysInMonth(month, year);
+    }, [month, year]);
+
+    useEffect(() => {
+        const thisMonthAndYear = findCurrentMonthAndYear();
+        setMonth(thisMonthAndYear[0]);
+        setYear(thisMonthAndYear[1]);
+        allDaysInMonth(thisMonthAndYear[0], thisMonthAndYear[1]);
+    }, [])
 
     if (loading) return 'loading...';
     if (error) return 'Error! ${error.message}';
@@ -48,8 +58,6 @@ const MonthlyCalendar = (): any => {
         }
         
     }
-
-    
 
     const decreaseMonth = () => {
         if (month === 0) {
@@ -77,21 +85,11 @@ const MonthlyCalendar = (): any => {
         setDaysInMonth(array);
         return array;
     }
-    useEffect(() => {
-        allDaysInMonth(month, year);
-    }, [month, year]);
 
     const title = () => {
         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         return months[month] + " " + year;
     }
-
-    useEffect(() => {
-        const thisMonthAndYear = findCurrentMonthAndYear();
-        setMonth(thisMonthAndYear[0]);
-        setYear(thisMonthAndYear[1]);
-        allDaysInMonth(thisMonthAndYear[0], thisMonthAndYear[1]);
-    }, [])
 
     const monthDayComponents = daysInMonth.map((index) => {
         return <Link className="days-of-month" to="/days"><MonthDayComponent day={index} month={month} year={year} key={index}/></Link>
