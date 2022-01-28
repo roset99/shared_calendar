@@ -45,6 +45,7 @@ const typeDefs = `
         getOneFamily(email: String): Family
         getOnePerson(id: ID): Person
         getOneEvent(id: ID): Event
+        getEventsByFamily(family: FamilyInput): [Event]
         getFamilyById(id: ID): Family
     }
 
