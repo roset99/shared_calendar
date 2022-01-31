@@ -117,20 +117,24 @@ export const resolvers = {
         },
         createEvent: async (root: any, { input }: any) => {
             const newEvent = new Events({
+                title: input.title,
                 family: input.family.id,
                 attendees: [],
                 date: input.date,
-                time: input.time
+                startTime: input.startTime,
+                endTime: input.endTime
             });
 
             newEvent.id = newEvent._id;           
 
             const returnEvent = {
                 id: newEvent.id,
+                title: input.title,
                 family: input.family.id,
                 attendees: new Array(),
                 date: input.date,
-                time: input.time
+                startTime: input.startTime,
+                endTime: input.endTime
             }
 
             for (let i = 0; i < input.attendees.length; i++) {
@@ -229,9 +233,11 @@ export const resolvers = {
         },
         createFamily: async (root: any, { input }: any) => {
             const newFamily = new Families({
+                familyName: input.familyName,
                 email: input.email,
                 password: input.password,
-                members: input.members
+                members: input.members,
+                events: input.events
             });
 
             newFamily.id = newFamily._id;
