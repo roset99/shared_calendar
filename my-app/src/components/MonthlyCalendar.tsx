@@ -4,6 +4,7 @@ import MonthDayComponent from './MonthDayComponent';
 import './MonthlyCalendar.css';
 import {Link, Route} from 'react-router-dom';
 import {gql, useQuery} from '@apollo/client';
+import DailyCalendar from './DailyCalendar';
 
 
 const GET_EVENTS = gql`
@@ -116,7 +117,7 @@ const MonthlyCalendar = (): any => {
         const date = index +"/" + month + 1 + "/" + year;
         let event: any[] = [];
         if (events === []) {
-            return <Link className="days-of-month" to="/days"><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>
+            return <Link className="days-of-month" to={"/days"}><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>
         } else {
             for (let item of events) {
                 
@@ -151,7 +152,7 @@ const MonthlyCalendar = (): any => {
     else { return (
 
         <div className="month-calendar">
-            <Route path="/days" render={()<DailyCalendar/>} /> 
+            
             <div className="title">
                 <button onClick={() => decreaseMonth()} className="button left-button"><i className="arrow left"></i></button>
                 <h1>{title()}</h1>
