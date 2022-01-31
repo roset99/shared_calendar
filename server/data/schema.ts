@@ -13,14 +13,17 @@ const typeDefs = `
 
     type Event {
         id: ID
+        title: String
         family: Family
         attendees: [Person]
         date: String
-        time: String
+        startTime: String
+        endTime: String
     }
 
     type Family {
         id: ID
+        familyName: String
         email: String
         password: String
         members: [Person]
@@ -59,6 +62,7 @@ const typeDefs = `
 
     input FamilyInput {
         id: ID
+        familyName: String
         email: String
         password: String
         members: [PersonInput]
@@ -67,16 +71,19 @@ const typeDefs = `
     
     input EventInput {
         id: ID
+        title: String
         family: FamilyInput
         attendees: [PersonInput]
         date: String
-        time: String
+        startTime: String
+        endTime: String
     }
 
     input UpdateEventInput {
         id: ID
         date: String
-        time: String
+        startTime: String
+        endTime: String
     }
 
     type Mutation {
