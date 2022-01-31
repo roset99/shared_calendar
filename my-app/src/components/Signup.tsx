@@ -2,6 +2,7 @@
 import e from 'express';
 import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';        
+import bcrypt from 'bcryptjs';
 
 const CREATE_FAMILY = gql`
     mutation CreateFamily($input: FamilyInput) {
@@ -27,6 +28,7 @@ function SignUp(): any {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [repassword, setRepassword] = useState("");
+    const [hashed, setHashed] = useState("");
 
     const [emailError, setEmailError] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
@@ -57,7 +59,7 @@ function SignUp(): any {
             invalid = true;
         }
 
-        if(!validateEmail(password)) {
+        if(!validatePassword(password)) {
             setPwdError(true);
             setErrorPwdMsg("Password must contain: Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character")
             invalid = true;
@@ -72,17 +74,20 @@ function SignUp(): any {
             return
         }
 
-
         createFamily({ 
             variables: {
                 input: { 
                     email: email,
-                    password: password
+                    password: hashed
                 }
             } 
         });
 
     }
+
+    //Generate salt to always be added to password
+    const salt = bcrypt.genSaltSync(10);
+
 
     const handleEmail = (e: any) => {
         setEmail(e.target.value);
@@ -90,11 +95,14 @@ function SignUp(): any {
 
     const handlePassword = (e: any) => {
         setPassword(e.target.value);
+        setHashed(bcrypt.hashSync(e.target.value, salt));
     }
 
     const handleRepassword = (e: any) => {
         setRepassword(e.target.value);
     }
+
+
 
     return (  
         <>
