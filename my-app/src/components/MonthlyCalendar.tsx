@@ -2,7 +2,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import MonthDayComponent from './MonthDayComponent';
 import './MonthlyCalendar.css';
-import {Link} from 'react-router-dom';
+import {Link, Route} from 'react-router-dom';
 import {gql, useQuery} from '@apollo/client';
 
 
@@ -38,6 +38,7 @@ const MonthlyCalendar = (): any => {
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
     const [events, setEvents] = useState<any>([]);
     const { loading, error, data } = useQuery(GET_EVENTS);
+    const [dateClicked, setDateClicked] = useState<string>("");
     
     
 
@@ -150,6 +151,7 @@ const MonthlyCalendar = (): any => {
     else { return (
 
         <div className="month-calendar">
+            <Route path="/days" render={()<DailyCalendar/>} /> 
             <div className="title">
                 <button onClick={() => decreaseMonth()} className="button left-button"><i className="arrow left"></i></button>
                 <h1>{title()}</h1>
@@ -160,6 +162,7 @@ const MonthlyCalendar = (): any => {
             </div>
             
         </div>
+        
         
     )};
     
