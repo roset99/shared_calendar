@@ -1,71 +1,37 @@
 import React, {useEffect, useState} from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';   
-
-// need to access: events, colour, family 
-// family passed down? query for family ! inc. people already in family & their colours 
-// signup family -> add family member(person)
-// login family -> see members / add family member 
-//function -> look at people colour chosen vs list 
+import { Link } from 'react-router-dom';
+//import GetFamily from './GetFamily';
 
 const CREATE_PERSON = gql`
     mutation CreatePerson($input: PersonInput) {
         createPerson(input: $input){
             name
             birthday 
-            events
+            events {
+               id
+            }
             colour
-            family
+            family {
+                id
+            }
         }
     }
 `;
-//mutation line: define arguments to be received & data type 
-// different for events, family 
-// colour is enum in schema 
-
 const GET_FAMILY = gql`
     query {
-        getAllFamilies {
-        family {
-            id
-            email
+       getAllFamilies {
+           id
+           email
             members {
-                name 
-                colour 
-            }
+               name 
+               colour 
+           }
             events {
-
-            }
-        }
-    }}
+                 id
+             }
+   }}
 `;
-
-function getFamily() {
-    const {loading, error, data} = useQuery(GET_FAMILY);
-    if (loading) return 'loading...';
-    if (error) return `Error: ${error.message}`;
-
-   // const [familyData, setFamilyData] = useState("");
-
-    // useEffect(() => {
-    //     if (data){
-    //    setFamilyData(data.getAllFamiliies);
-    //     }
-    // }, [data]);
-
-    return (
-    //    <select name="family">
-    //        {data.family.map((f: any) => (
-    //            <option key={f.id} value={f.email}>
-    //                {f.email}
-    //            </option>
-    //        ))}
-    //    </select>
-    <></>
-    );
-}
-
-// interface for family data? look up typescript
-
 
 function availableColours() {
  // compare each family.members.colour value to array of colours 
@@ -73,21 +39,34 @@ function availableColours() {
  const colours: string[] = ["ffadad", "ffd6a5", "fdffb6", "caffbf", "a0c4ff", "bdb2ff", "ffc6ff"];   
 }
 
-const CreatePersonComponent = () => {
 
+const CreatePerson: any = ({}) => {
+    const {data: getFamilyData, loading, error} = useQuery(GET_FAMILY);
+    console.log(getFamilyData);
+    
     const [name, setName] = useState("");
     // const [name, setName] = useState<string>(""); <- included data type
     const [birthday, setBirthday] = useState("");
     const [event, setEvent] = useState("");
     const [colour, setColour] = useState("");
     const [family, setFamily] = useState("");
+    const [createPerson, { data: createPersonData, loading: personLoading, error: personError }] = useMutation(CREATE_PERSON);
+   const [familyData, setFamilyData] = useState([]);
     
+    useEffect(() => {
+        if(getFamilyData){
+        setFamilyData(getFamilyData.getAllFamilies);
+        }
+    }, []);
 
-    const [createPerson, { data, loading, error }] = useMutation(CREATE_PERSON);
+    const colours: string[] = ["ffadad", "ffd6a5", "fdffb6", "caffbf", "a0c4ff", "bdb2ff", "ffc6ff"]; 
 
-    if (loading) return 'Submitting...';
-    if (error) return `Submission error! ${error.message}`;
-
+    if (personLoading) return 'Submitting...';
+    if (personError) return `Submission error! ${personError.message}`;
+    if (loading) return 'loading...';
+    if (error) return `Error: ${error.message}`;
+   
+    
      const addPerson = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -125,7 +104,7 @@ const CreatePersonComponent = () => {
     }
 
     return (
-        <>
+      <>
             <form id="add-person" onSubmit={addPerson} >
                 <h1>Add family member</h1>
 
@@ -140,21 +119,32 @@ const CreatePersonComponent = () => {
 
                 <label htmlFor="colour">Choose colour</label>
                 <select name="colour" id="colour" onChange={handleColour}>
-                    <option value="" disabled >Select colour</option>
-                    <option value=""></option>
+                    <option value="">Select colour</option>
+                    {colours.map((c: any, i) => (
+                  <option key={i}>{c}</option>
+              )) }
                 </select>
 
                 <label htmlFor="family">Family</label>
                 <select name="select-family" id="select-family" onChange={handleFamily} >
                     <option value="" disabled >Select family</option>
-                    <option value=""></option>
-                </select>
+                    {getFamilyData.getAllFamilies.map((f: any) => (
+                   <option key={f.id} value={f.email}>
+                       {f.email}
+                   </option>
+               ))} 
+                </select> 
 
                 <button type="submit" className="submit-person" id="submit-btn" >Submit Person</button>
             </form >
-        </>
+           
+            <div>
+          
+            </div>
+          <Link to="/family">get family</Link>
+   </>
     )
 }
-export default CreatePersonComponent;
+export default CreatePerson;
 
 // make family required 
