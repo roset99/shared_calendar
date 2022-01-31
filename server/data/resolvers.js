@@ -98,10 +98,11 @@ export const resolvers = {
         createEvent: async (root, { input }) => {
             const newEvent = new Events({
                 family: input.family.id,
-                attendees: [],
+                attendees: input.attendees,
                 date: input.date,
                 time: input.time
             });
+            console.log(newEvent);
 
             newEvent.id = newEvent._id;           
 
