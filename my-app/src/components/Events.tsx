@@ -5,6 +5,8 @@ import AddEvent from './AddEvent'
 import { EventsList } from './EventsList';
 import { EventInputInterface, EventInterface } from './Interfaces';
 
+// || ==================== GraphQL Queries/Mutations ==================== ||
+
 const CREATE_EVENT = gql`
     mutation CreateEvent($input: EventInput) {
         createEvent(input: $input) {
@@ -13,19 +15,24 @@ const CREATE_EVENT = gql`
     }
 `;
 
+// || ==================== Component ==================== ||
+
 const Events: any = () => {
+
     const [event, setEvent] = useState<string>("");
     const [events, setEvents] = useState<EventInterface[]>([]);
 
     const [show, setShow] = useState(false);
 
-    const [createEvent, { data, loading, error }] = useMutation(CREATE_EVENT);
+    const [createEvent, { data: createEventData, loading: createEventLoading, error: createEventError }] = useMutation(CREATE_EVENT);
 
-    if (loading) return 'Submitting...';
-    if (error) return `Submission error! ${error.message}`;
+    if (createEventLoading) return 'Submitting...';
+    if (createEventError) return `Submission error! ${createEventError.message}`;
+
+    // || ========== Functions ========== ||
 
     //Used later when trying to submit form
-    const handleAddEvent = (e: React.FormEvent, newEvent: EventInputInterface) => {
+    const handleAddEvent = (e: React.FormEvent, newEvent: EventInputInterface): void => {
         e.preventDefault();
 
         // if(event) {
@@ -34,16 +41,21 @@ const Events: any = () => {
         // }
 
         createEvent({ 
-          variables: {
-              input: { 
-                  family: newEvent.family,
-                  attendees: newEvent.attendees,
-                  date: newEvent.date,
-                  time: newEvent.time
-              }
-          } 
-      }).then(result => console.log(result))
+            variables: {
+                input: { 
+                    title: newEvent.title,
+                    family: newEvent.family,
+                    attendees: newEvent.attendees,
+                    date: newEvent.date,
+                    startTime: newEvent.startTime,
+                    endTime: newEvent.endTime
+                }
+            } 
+        })
+            .then(result => console.log(result))
     }
+
+    // || ========== Render return ========== ||
 
     return (
       <>
