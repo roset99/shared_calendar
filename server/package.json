@@ -29,7 +29,7 @@
   "scripts": {
     "build": "tsc --w",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon -w ./**/*.ts --exec ts-node index.ts"
+    "start": "tsc && ts-node ./dist/index.js"
   },
   "author": "\"Team Calendar",
   "license": "ISC"
