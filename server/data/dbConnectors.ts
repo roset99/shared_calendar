@@ -21,6 +21,7 @@ async function main(): Promise<void> {
 // || ========== Schemas and Interfaces ========== ||
 
 export interface Family {
+    familyName: string;
     email: string;
     password: string;
     members: Types.ObjectId[];
@@ -28,6 +29,7 @@ export interface Family {
 }
 
 const familySchema = new Schema<Family>({
+    familyName: { type: String },
     email: { type: String },
     password: { type: String },
     members: [{ type: Types.ObjectId, ref: 'people' }],
@@ -51,19 +53,21 @@ const personSchema = new Schema<Person>({
 });
 
 interface Event {
+    title: string;
     family: Types.ObjectId;
-    owner: Types.ObjectId;
     attendees: Types.ObjectId[];
     date: string;
-    time: string;
+    startTime: string;
+    endTime: string;
 }
 
 const eventSchema = new Schema<Event>({
+    title: { type: String },
     family: { type: Types.ObjectId, ref: 'families' },
-    owner: { type: Types.ObjectId, ref: 'people' },
     attendees: [{ type: Types.ObjectId, ref: 'people' }],
     date: { type: String },
-    time: { type: String }
+    startTime: { type: String },
+    endTime: { type: String }
 });
 
 // || ========== Models ========== ||

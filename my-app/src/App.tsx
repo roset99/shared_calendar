@@ -7,6 +7,7 @@ import MonthlyCalendar from './components/MonthlyCalendar';
 import SignUp from './components/Signup';
 import Login from "./components/Login"
 import Events from './components/Events';
+import DailyCalendar from './components/DailyCalendar';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/signup" element={<SignUp/>} />  
           <Route path="/login" element={<Login/>} />   
           <Route path="/events" element={<Events/>} /> 
+          <Route path="/days" element={<DailyCalendar/>} /> 
       </Routes>
     </BrowserRouter>
   );

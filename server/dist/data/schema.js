@@ -1,6 +1,8 @@
-import { makeExecutableSchema } from 'graphql-tools';
-import { resolvers } from './resolvers';
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.schema = void 0;
+const graphql_tools_1 = require("graphql-tools");
+const resolvers_1 = require("./resolvers");
 const typeDefs = `
     type Person {
         id: ID
@@ -98,7 +100,6 @@ const typeDefs = `
         deleteEvent(id: ID!): String
     }
 `;
-
-const schema = makeExecutableSchema({ typeDefs, resolvers });
-
-export { schema };
+const schema = (0, graphql_tools_1.makeExecutableSchema)({ typeDefs, resolvers: resolvers_1.resolvers });
+exports.schema = schema;
+//# sourceMappingURL=schema.js.map
