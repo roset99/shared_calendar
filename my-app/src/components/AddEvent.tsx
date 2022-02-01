@@ -1,33 +1,48 @@
 import React, { useState } from 'react';
+import { gql, useMutation } from '@apollo/client';
 
 import { EventInputInterface } from './Interfaces';
 
-// || ==================== Props Interface ==================== ||
+// || ==================== GraphQL Queries/Mutations ==================== ||
+
+const CREATE_EVENT = gql`
+    mutation CreateEvent($input: EventInput) {
+        createEvent(input: $input) {
+            id
+        }
+    }
+`;
+
+// || ==================== Props Interface  ==================== ||
 
 interface Props {
     // to do with opening and closing popup
     show: boolean;
     onClose: () => void;
 
-    // to do with handling add event
-    handleAddEvent: (e: React.FormEvent, newEvent: EventInputInterface) => void;
-    event: string;
-    setEvent: React.Dispatch<React.SetStateAction<string>>;
-
     // passed down to be inserted into addEvent request
-    family: any
-    members: any
+    family: any;
+    members: any;
+
+    // whether is being displayed from month or day page
+    day: string;
 }
 
 // || ==================== Component ==================== ||
 
-const AddEvent: React.FC<Props> = ({ show, onClose, handleAddEvent, event, setEvent, family, members }) => {
+const AddEvent: any = ({ show, onClose, family, members, day }: Props) => {
     
     const [title, setTitle] = useState<string>("");
     const [date, setDate] = useState<string>("");
+    if (day) { setDate(day) };
     const [startTime, setStartTime] = useState<string>("");
     const [endTime, setEndTime] = useState<string>("");
     const [attendees, setAttendees] = useState<[]>([]);
+
+    const [createEvent, { data: createEventData, loading: createEventLoading, error: createEventError }] = useMutation(CREATE_EVENT);
+
+    if (createEventLoading) return 'Submitting...';
+    if (createEventError) return `Submission error! ${createEventError.message}`;
 
     if(!show) { return null; } // returns null if popup is not to be shown
 
@@ -45,7 +60,19 @@ const AddEvent: React.FC<Props> = ({ show, onClose, handleAddEvent, event, setEv
             endTime: endTime
         }
 
-        handleAddEvent(e, newEvent);
+        createEvent({ 
+            variables: {
+                input: { 
+                    title: newEvent.title,
+                    family: newEvent.family,
+                    attendees: newEvent.attendees,
+                    date: newEvent.date,
+                    startTime: newEvent.startTime,
+                    endTime: newEvent.endTime
+                }
+            } 
+        })
+            .then(result => console.log(result))
     }
 
     // || ========== Render return ========== ||
@@ -57,9 +84,16 @@ const AddEvent: React.FC<Props> = ({ show, onClose, handleAddEvent, event, setEv
 
             <label htmlFor='title'>Title</label>
             <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
-            
-            <label htmlFor='date'>Date</label>
-            <input type="text" value={date} onChange={(e) => setDate(e.target.value)} />
+            { day ?
+            <>
+                <p>Date: {day}</p>
+            </>
+            :
+            <>
+                <label htmlFor='date'>Date</label>
+                <input type="text" value={date} onChange={(e) => setDate(e.target.value)} />
+            </>
+            }
 
             <label htmlFor='startTime'>Start Time</label>
             <input type="text" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
