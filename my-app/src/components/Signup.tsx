@@ -19,7 +19,7 @@ function validateEmail (email: string) {
   }
 
 function validatePassword (pwd: string) {
-    const regexp = /"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"/;
+    const regexp = /^(?=.*\d)(?=.*[!@#$%^&*.])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
     return regexp.test(pwd);
 }
 
@@ -47,6 +47,9 @@ function SignUp(): any {
 
     const doStuff = (e: React.FormEvent) => {
         e.preventDefault();
+
+        console.log(email, validateEmail(email));
+        console.log(password, validatePassword(password))
 
         if(email === "" || email === null) {
             setEmailError(true);
