@@ -7,8 +7,8 @@ const MonthDayComponent = ({day, month, year, event}: any) => {
     const [members, setMembers] = useState<any[]>([]);
     
     const findAttendeesList = ()  => {
-            console.log("start findAttendeesList attendeesList: ", attendeesList);
-            console.log(attendeesList.map(d => d.name));
+            // console.log("start findAttendeesList attendeesList: ", attendeesList);
+            // console.log(attendeesList.map(d => d.name));
             for (let e of event) {
                 console.log("component date: ", e.date);
                 for (let a of e.attendees) {

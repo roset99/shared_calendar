@@ -49,8 +49,8 @@ const MonthlyCalendar = (): any => {
         if (!loading && !error ){
             setEvents(data.getEventsByFamily);
             console.log("this is data ", data.getEventsByFamily);
-        }
-                
+            
+        }  
     }
 
 
@@ -117,7 +117,7 @@ const MonthlyCalendar = (): any => {
         const date = index +"/" + month + 1 + "/" + year;
         let event: any[] = [];
         if (events === []) {
-            return <Link className="days-of-month" to={"/days"}><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>
+            return <Link className="days-of-month" to="/days" state={{date: date}}><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>
         } else {
             for (let item of events) {
                 
@@ -129,7 +129,7 @@ const MonthlyCalendar = (): any => {
                 }
     
             }
-            return <Link className="days-of-month" to={{pathname: "/days", state: date}}><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>
+            return <Link className="days-of-month" to="/days" state={{date: date}}><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>
         }
        
         
@@ -144,6 +144,10 @@ const MonthlyCalendar = (): any => {
     useEffect(() => {
         allDaysInMonth(month, year);
     }, [month, year]);
+    useEffect(() => {
+        sessionStorage.setItem("events", JSON.stringify(events));
+        console.log("this is session storage " + sessionStorage.getItem("events"));
+    }, [events]);
     useEffect(() => {
         getEvents();
     }, [data]);
