@@ -1,0 +1,14 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    max-width: 80%;
+    align-items: center;
+}
+
+.person-input {
+    width: 10rem;
+}
+
+.select-input {
+    width: 10rem;
+}
