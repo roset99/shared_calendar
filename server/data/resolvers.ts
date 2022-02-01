@@ -103,6 +103,7 @@ export const resolvers = {
             return ('Successfully deleted person');
         },
         createEvent: async (root: any, { input }: any) => {
+            // create event db object using input
             const newEvent = new Events({
                 title: input.title,
                 family: input.family.id,
@@ -114,42 +115,27 @@ export const resolvers = {
 
             newEvent.id = newEvent._id;           
 
-            const returnEvent = {
-                id: newEvent.id,
-                title: input.title,
-                family: input.family.id,
-                attendees: new Array(),
-                date: input.date,
-                startTime: input.startTime,
-                endTime: input.endTime
-            }
-
+            // loop through input.attendees
             for (let i = 0; i < input.attendees.length; i++) {
-                const person = await People.findById(input.attendees[i].id)
-                    .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
-                if (!person) {
-                    throw new Error("Error")
-                }
-                person.events.push(newEvent.id);
+                const personId: any = input.attendees[i].id;
 
-                await People.updateOne({ _id: person.id }, person, { new: true })
-                    .catch((error) => { console.log("error! Mutation Request failed" + error.message) })
+                // add event.id to person.events
+                await People.updateOne({ _id: personId }, { "$push": { "events": { _id: newEvent.id }}});
 
-                newEvent.attendees.push(person.id);
-                returnEvent.attendees.push(person);   
+                // add person id to event attendees
+                newEvent.attendees.push(personId);  
             }
 
-            newEvent.save()
+            // save event to database
+            await newEvent.save()
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
-            
-            // const family = await Families.findById(newEvent.family)
-            // family.events.push(newEvent)
 
-            // Families.updateOne({ _id: family.id }, family, { new: true }).catch((error) => {console.log("error! Mutation Request failed" + error.message)})
-
+            // add event to family.events
             await Families.updateOne({ _id: newEvent.family }, { "$push": { "events": { _id: newEvent.id }}});
 
-            return returnEvent;
+            return Events.findById(newEvent.id)
+                .populate({ path: 'attendees', populate: { path: 'family' }})
+                .populate({ path: 'family', populate: { path: 'members' }});
         },
         updateEvent: async (root: any, { input }: any) => {
             // const oldEvent = await Events.findOneAndUpdate({ _id: input.id }, input, { new: false }, () => {});
@@ -187,38 +173,30 @@ export const resolvers = {
                 .populate({ path: 'family', populate: { path: 'members' }});    
         },
         deleteEvent: async (root: any, { id }: any) => {
+            // get event from database by id
             const event = await Events.findById(id)
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message) });            
             if (!event) {
                 throw new Error("Error")
             }
 
+            // delete event from db
             await Events.deleteOne({ _id: id })
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
 
-            // const family = await Families.findById(event.family)
-            //     .catch((error) => { console.log("error! Mutation Request failed" + error.message) });;
-            // family.events.pull(id);
-            // family.save();
-
-            await Families.updateOne({ _id: event.family }, { "$pull": { "events": { _id: event.id }}});
+            // remove event form family.events
+            await Families.updateOne({ _id: event.family }, { "$pull": { "events": event.id }});
 
             // remove from person.events
             for (let i = 0; i < event.attendees.length; i++) {
-                // const person = await People.findById(event.attendees[i], () => {}) 
-                //     .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
-
-                // person.events.pull(event.id);
-
-                // await People.updateOne({ _id: person.id }, person, { new: true }, () => {})
-                //     .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
-
-                await People.updateOne({ _id: event.attendees[i] }, { "$pull": { "attendees": { _id: event.id }}});
+                const personId = event.attendees[i];
+                await People.updateOne({ _id: personId }, { "$pull": { "events": event.id }});
             } 
             
             return ('Successfully deleted event');
         },
         createFamily: async (root: any, { input }: any) => {
+            // create family db object
             const newFamily = new Families({
                 familyName: input.familyName,
                 email: input.email,
@@ -229,36 +207,36 @@ export const resolvers = {
 
             newFamily.id = newFamily._id;
 
-            newFamily.save((err) => {});
-            return newFamily
+            // save to db and return family
+            newFamily.save();
+            return newFamily // no populate as family will not contain members/events at this point
         },
         updateFamily: async (root: any, { input }: any) => {
-            return Families.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err) => {}) 
+            // cannot update members and events with this
+            return Families.findOneAndUpdate({ _id: input.id }, input, { new: true }) 
         },
         deleteFamily: async (root: any, { id }: any) => {
+            // get family from db with id
             const family = await Families.findById(id);
             if (!family) {
                 throw new Error
             }
 
-            for (let i=0; i < family.members.length; i++){
-                const member = await People.findById(family.members[i]);
-                if (!member) {
-                    throw new Error
-                }
-                await People.deleteOne({ _id: member.id })
+            // delete people in family.members
+            for (let i = 0; i < family.members.length; i++){
+                const personId = family.members[i]
+                await People.deleteOne({ _id: personId })
             }
         
-            for (let i=0; i < family.events.length; i++){
-                const event = await Events.findById(family.events[i]);
-                if (!event) {
-                    throw new Error
-                }
-                await Events.deleteOne({ _id: event.id })
+            // delete events in family.events
+            for (let i = 0; i < family.events.length; i++){
+                const eventId = family.events[i]
+                await Events.deleteOne({ _id: eventId })
             }
             
+            // delete family from db
             await Families.deleteOne({ _id: id });
-            return ('Succesfully deleted family')
+            return ('Succesfully deleted family');
         }
     },
 };
