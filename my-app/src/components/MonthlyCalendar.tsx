@@ -2,8 +2,9 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import MonthDayComponent from './MonthDayComponent';
 import './MonthlyCalendar.css';
-import {Link} from 'react-router-dom';
+import {Link, Route} from 'react-router-dom';
 import {gql, useQuery} from '@apollo/client';
+import DailyCalendar from './DailyCalendar';
 
 
 const GET_EVENTS = gql`
@@ -38,14 +39,18 @@ const MonthlyCalendar = (): any => {
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
     const [events, setEvents] = useState<any>([]);
     const { loading, error, data } = useQuery(GET_EVENTS);
+    const [dateClicked, setDateClicked] = useState<string>("");
     
     
 
     
 
     const getEvents = (): void => {
-                setEvents(data);
-                console.log("this is data ", data);
+        if (!loading && !error ){
+            setEvents(data.getEventsByFamily);
+            console.log("this is data ", data.getEventsByFamily);
+            
+        }  
     }
 
 
@@ -109,20 +114,22 @@ const MonthlyCalendar = (): any => {
     
 
     const monthDayComponents = daysInMonth.map((index) => {
-        const date = index + 1 +"/" + month + "/" + year;
+        const date = index +"/" + month + 1 + "/" + year;
         let event: any[] = [];
-        if (events === undefined) {
-            return <Link className="days-of-month" to="/days"><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>
+        if (events === []) {
+            return <Link className="days-of-month" to="/days" state={{date: date}}><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>
         } else {
             for (let item of events) {
+                
                 if (item.date === date) {
                     console.log(item);
                     event.push(item);
-                    break;
+                    console.log("data: ", item.date, "and ", "month date: ", date);
+                    
                 }
     
             }
-            return <Link className="days-of-month" to="/days"><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>
+            return <Link className="days-of-month" to="/days" state={{date: date}}><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>
         }
        
         
@@ -138,6 +145,10 @@ const MonthlyCalendar = (): any => {
         allDaysInMonth(month, year);
     }, [month, year]);
     useEffect(() => {
+        sessionStorage.setItem("events", JSON.stringify(events));
+        console.log("this is session storage " + sessionStorage.getItem("events"));
+    }, [events]);
+    useEffect(() => {
         getEvents();
     }, [data]);
     if (loading) return <h1>loading...</h1>;
@@ -145,6 +156,7 @@ const MonthlyCalendar = (): any => {
     else { return (
 
         <div className="month-calendar">
+            
             <div className="title">
                 <button onClick={() => decreaseMonth()} className="button left-button"><i className="arrow left"></i></button>
                 <h1>{title()}</h1>
@@ -155,6 +167,7 @@ const MonthlyCalendar = (): any => {
             </div>
             
         </div>
+        
         
     )};
     

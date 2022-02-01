@@ -1,16 +1,22 @@
 .month-day {
   display: grid;
-  grid-template-columns: 12% 22% 22% 22% 22%;
+  grid-template-columns: 12% 88%;
   color: red;
   width: 100%;
   margin: auto;
   border-bottom: 3px #f8edeb solid;
 }
+.members-events-list {
+  display: flex;
+  flex-direction: horizontal;
+}
 .member {
   width: 85%;
+  height: 85%;
   margin: auto;
   padding: auto;
   text-align: center;
+  color: white;
 }
 .date {
   color: #001219;
@@ -20,4 +26,25 @@
   padding: 1em;
   width: 100%;
   text-align: center;
+}
+.colour-ffadad {
+  background-color: #ffadad;
+}
+.colour-ffd6a5 {
+  background-color: #ffd6a5;
+}
+.colour-fdffb6 {
+  background-color: #fdffb6;
+}
+.colour-caffbf {
+  background-color: #caffbf;
+}
+.colour-a0c4ff {
+  background-color: #a0c4ff;
+}
+.colour-bdb2ff {
+  background-color: #bdb2ff;
+}
+.colour-ffc6ff {
+  background-color: #ffc6ff;
 }
