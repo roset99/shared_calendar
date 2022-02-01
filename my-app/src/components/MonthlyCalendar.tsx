@@ -1,5 +1,5 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useState } from 'react';
 import MonthDayComponent from './MonthDayComponent';
 import './MonthlyCalendar.css';
 import {Link, Route} from 'react-router-dom';
@@ -41,11 +41,36 @@ const MonthlyCalendar = (): any => {
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
     const [events, setEvents] = useState<any>([]);
     const { loading, error, data } = useQuery(GET_EVENTS);
+    const [family, setFamily] = useState<any>(null);
+    const [familyMembers, setFamilyMembers] = useState<any[]>([]);
     const [dateClicked, setDateClicked] = useState<string>("");
     
+    // function getSessionStorageOrDefault(key: string, defaultValue: null) {
+    //     const stored = sessionStorage.getItem(key);
     
+    //     if (!stored) {
+    //       return defaultValue;
+    //     }
+    
+    //     return JSON.parse(stored);
+    //   }
 
+    // const accessFamily = () => {
+    //     const familyFromStore = getSessionStorageOrDefault("family", null);
+    //     setFamily(familyFromStore);
+    // }
     
+    // const findFamilyMembers = () => {
+    //     if (family !== null) {
+    //         setFamilyMembers(family.members);
+    //     }
+        
+    // }
+
+    // useEffect(() => {
+    //     accessFamily();
+    //     findFamilyMembers();
+    // }, []);
 
     const getEvents = (): void => {
         if (!loading && !error ){
