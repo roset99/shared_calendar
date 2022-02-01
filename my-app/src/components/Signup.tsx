@@ -23,7 +23,7 @@ function validatePassword (pwd: string) {
     return regexp.test(pwd);
 }
 
-function SignUp({onLoginSetFamily}): any {
+function SignUp({onLoginSetFamily}:any): any {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");

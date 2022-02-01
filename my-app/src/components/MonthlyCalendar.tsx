@@ -9,7 +9,7 @@ import DailyCalendar from './DailyCalendar';
 
 const GET_EVENTS = gql`
 query{
-    getEventsByFamily (family: {id: "61f3c4912f44ea46c45ef30b"}){
+    getEventsByFamily (family: {id: "61f962e8c0222225708864e0"}){
          
         id
         family {
@@ -26,7 +26,9 @@ query{
             colour
         }
         date 
-        time
+        startTime
+        endTime
+        title
     
     
     }
@@ -59,18 +61,18 @@ const MonthlyCalendar = (): any => {
         return [d.getMonth(), d.getFullYear()];
     }
 
-    const increaseMonth = async () => {
+    const increaseMonth = () => {
         console.log(month);
         if (month === 11) {
-            const newMonthIndex = await 0;
+            const newMonthIndex = 0;
             const newYear = year + 1;
             setYear(newYear);
             setMonth(newMonthIndex);   
             console.log(month);     
         } else {
-            const newMonthIndex = await month + 1;
+            const newMonthIndex = month + 1;
             setMonth(newMonthIndex);
-            console.log(month);
+            console.log(newMonthIndex);
         }
         
     }
@@ -114,7 +116,20 @@ const MonthlyCalendar = (): any => {
     
 
     const monthDayComponents = daysInMonth.map((index) => {
-        const date = index +"/" + month + 1 + "/" + year;
+        let monthFormat = "";
+        let dayFormat = "";
+        if (month < 10 ){
+           const month1 = month + 1; 
+           monthFormat = "0" + month1;
+        } else {
+            monthFormat = month.toString();
+        } 
+        if (index < 10 ){ 
+            dayFormat = "0" + index;
+         } else {
+             dayFormat = index.toString();
+         } 
+        const date = dayFormat +"/" + monthFormat + "/" + year;
         let event: any[] = [];
         if (events === []) {
             return <Link className="days-of-month" to="/days" state={{date: date}}><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>

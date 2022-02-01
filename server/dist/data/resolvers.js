@@ -62,6 +62,7 @@ exports.resolvers = {
     },
     Mutation: {
         createPerson: (root, { input }) => __awaiter(void 0, void 0, void 0, function* () {
+            // create new person db object and save in database
             const newPerson = new dbConnectors_1.People({
                 name: input.name,
                 birthday: input.birthday,
@@ -72,50 +73,39 @@ exports.resolvers = {
             newPerson.id = newPerson._id;
             newPerson.save()
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message); });
-            const family = yield dbConnectors_1.Families.findById(newPerson.family);
-            if (!family) {
-                throw new Error;
-            }
-            family.members.push(newPerson.id);
-            dbConnectors_1.Families.updateOne({ _id: family.id }, family, { new: true })
+            // push person.id to family.members
+            // (could potentially use findOneAndUpdate as this also returns family)
+            yield dbConnectors_1.Families.updateOne({ _id: newPerson.family }, { "$push": { "members": { _id: newPerson.id } } })
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message); });
-            const returnPerson = {
-                id: newPerson.id,
-                name: newPerson.name,
-                birthday: newPerson.birthday,
-                events: newPerson.events,
-                colour: newPerson.colour,
-                family: family
-            };
-            return returnPerson;
+            // return person to be displayed
+            return dbConnectors_1.People.findById(newPerson.id)
+                .populate({ path: 'family' })
+                .catch((error) => { console.log("error! Mutation Request failed" + error.message); });
         }),
         updatePerson: (root, { input }) => __awaiter(void 0, void 0, void 0, function* () {
+            // todo: validation for family and events (can or cannot change)
             yield dbConnectors_1.People.findOneAndUpdate({ _id: input.id }, input, { new: true })
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message); });
             return yield dbConnectors_1.People.findById(input.id)
-                .populate('family')
+                .populate({ path: 'family' }).populate({ path: 'events' })
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message); });
         }),
         deletePerson: (root, { id }) => __awaiter(void 0, void 0, void 0, function* () {
+            // todo: delete person from events
+            // get person to use person.family to delete from family.members
             const person = yield dbConnectors_1.People.findById(id)
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message); });
             if (!person) {
                 return ('Person not found');
             }
+            yield dbConnectors_1.Families.updateOne({ _id: person.family }, { "$pull": { "members": person.id } });
+            // delete person
             yield dbConnectors_1.People.deleteOne({ _id: id })
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message); });
-            // const family = await Families.findById(person.family)
-            //     .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
-            // if (!family) {
-            //     return ('Family not found')
-            // }
-            // family.members.pull(id);
-            // family.save()
-            //     .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
-            yield dbConnectors_1.Families.updateOne({ _id: person.family }, { "$pull": { "members": { _id: person.id } } });
             return ('Successfully deleted person');
         }),
         createEvent: (root, { input }) => __awaiter(void 0, void 0, void 0, function* () {
+            // create event db object using input
             const newEvent = new dbConnectors_1.Events({
                 title: input.title,
                 family: input.family.id,
@@ -125,34 +115,22 @@ exports.resolvers = {
                 endTime: input.endTime
             });
             newEvent.id = newEvent._id;
-            const returnEvent = {
-                id: newEvent.id,
-                title: input.title,
-                family: input.family.id,
-                attendees: new Array(),
-                date: input.date,
-                startTime: input.startTime,
-                endTime: input.endTime
-            };
+            // loop through input.attendees
             for (let i = 0; i < input.attendees.length; i++) {
-                const person = yield dbConnectors_1.People.findById(input.attendees[i].id)
-                    .catch((error) => { console.log("error! Mutation Request failed" + error.message); });
-                if (!person) {
-                    throw new Error("Error");
-                }
-                person.events.push(newEvent.id);
-                yield dbConnectors_1.People.updateOne({ _id: person.id }, person, { new: true })
-                    .catch((error) => { console.log("error! Mutation Request failed" + error.message); });
-                newEvent.attendees.push(person.id);
-                returnEvent.attendees.push(person);
+                const personId = input.attendees[i].id;
+                // add event.id to person.events
+                yield dbConnectors_1.People.updateOne({ _id: personId }, { "$push": { "events": { _id: newEvent.id } } });
+                // add person id to event attendees
+                newEvent.attendees.push(personId);
             }
-            newEvent.save()
+            // save event to database
+            yield newEvent.save()
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message); });
-            // const family = await Families.findById(newEvent.family)
-            // family.events.push(newEvent)
-            // Families.updateOne({ _id: family.id }, family, { new: true }).catch((error) => {console.log("error! Mutation Request failed" + error.message)})
-            yield dbConnectors_1.Families.updateOne({ _id: newEvent.family }, { "$push": { "members": { _id: newEvent.id } } });
-            return returnEvent;
+            // add event to family.events
+            yield dbConnectors_1.Families.updateOne({ _id: newEvent.family }, { "$push": { "events": { _id: newEvent.id } } });
+            return dbConnectors_1.Events.findById(newEvent.id)
+                .populate({ path: 'attendees', populate: { path: 'family' } })
+                .populate({ path: 'family', populate: { path: 'members' } });
         }),
         updateEvent: (root, { input }) => __awaiter(void 0, void 0, void 0, function* () {
             // const oldEvent = await Events.findOneAndUpdate({ _id: input.id }, input, { new: false }, () => {});
@@ -183,30 +161,26 @@ exports.resolvers = {
                 .populate({ path: 'family', populate: { path: 'members' } });
         }),
         deleteEvent: (root, { id }) => __awaiter(void 0, void 0, void 0, function* () {
+            // get event from database by id
             const event = yield dbConnectors_1.Events.findById(id)
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message); });
             if (!event) {
                 throw new Error("Error");
             }
+            // delete event from db
             yield dbConnectors_1.Events.deleteOne({ _id: id })
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message); });
-            // const family = await Families.findById(event.family)
-            //     .catch((error) => { console.log("error! Mutation Request failed" + error.message) });;
-            // family.events.pull(id);
-            // family.save();
-            yield dbConnectors_1.Families.updateOne({ _id: event.family }, { "$pull": { "events": { _id: event.id } } });
+            // remove event form family.events
+            yield dbConnectors_1.Families.updateOne({ _id: event.family }, { "$pull": { "events": event.id } });
             // remove from person.events
             for (let i = 0; i < event.attendees.length; i++) {
-                // const person = await People.findById(event.attendees[i], () => {}) 
-                //     .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
-                // person.events.pull(event.id);
-                // await People.updateOne({ _id: person.id }, person, { new: true }, () => {})
-                //     .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
-                yield dbConnectors_1.People.updateOne({ _id: event.attendees[i] }, { "$pull": { "attendees": { _id: event.id } } });
+                const personId = event.attendees[i];
+                yield dbConnectors_1.People.updateOne({ _id: personId }, { "$pull": { "events": event.id } });
             }
             return ('Successfully deleted event');
         }),
         createFamily: (root, { input }) => __awaiter(void 0, void 0, void 0, function* () {
+            // create family db object
             const newFamily = new dbConnectors_1.Families({
                 familyName: input.familyName,
                 email: input.email,
@@ -215,31 +189,31 @@ exports.resolvers = {
                 events: input.events
             });
             newFamily.id = newFamily._id;
-            newFamily.save((err) => { });
-            return newFamily;
+            // save to db and return family
+            newFamily.save();
+            return newFamily; // no populate as family will not contain members/events at this point
         }),
         updateFamily: (root, { input }) => __awaiter(void 0, void 0, void 0, function* () {
-            return dbConnectors_1.Families.findOneAndUpdate({ _id: input.id }, input, { new: true }, (err) => { });
+            // cannot update members and events with this
+            return dbConnectors_1.Families.findOneAndUpdate({ _id: input.id }, input, { new: true });
         }),
         deleteFamily: (root, { id }) => __awaiter(void 0, void 0, void 0, function* () {
+            // get family from db with id
             const family = yield dbConnectors_1.Families.findById(id);
             if (!family) {
                 throw new Error;
             }
+            // delete people in family.members
             for (let i = 0; i < family.members.length; i++) {
-                const member = yield dbConnectors_1.People.findById(family.members[i]);
-                if (!member) {
-                    throw new Error;
-                }
-                yield dbConnectors_1.People.deleteOne({ _id: member.id });
+                const personId = family.members[i];
+                yield dbConnectors_1.People.deleteOne({ _id: personId });
             }
+            // delete events in family.events
             for (let i = 0; i < family.events.length; i++) {
-                const event = yield dbConnectors_1.Events.findById(family.events[i]);
-                if (!event) {
-                    throw new Error;
-                }
-                yield dbConnectors_1.Events.deleteOne({ _id: event.id });
+                const eventId = family.events[i];
+                yield dbConnectors_1.Events.deleteOne({ _id: eventId });
             }
+            // delete family from db
             yield dbConnectors_1.Families.deleteOne({ _id: id });
             return ('Succesfully deleted family');
         })

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import Homepage from './components/Homepage';
 import { BrowserRouter,Routes,Route } from 'react-router-dom';
@@ -23,7 +23,7 @@ function App() {
     if (!stored) {
       return defaultValue;
     }
-    
+
     return JSON.parse(stored);
   }
 
