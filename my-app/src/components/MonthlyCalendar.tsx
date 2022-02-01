@@ -129,7 +129,7 @@ const MonthlyCalendar = (): any => {
                 }
     
             }
-            return <Link className="days-of-month" to="/days"><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>
+            return <Link className="days-of-month" to={{pathname: "/days", state: date}}><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>
         }
        
         
