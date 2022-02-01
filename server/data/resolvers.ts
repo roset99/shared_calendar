@@ -51,6 +51,7 @@ export const resolvers = {
     },
     Mutation: {
         createPerson: async (root: any, { input }: any) => {
+            // create new person db object and save in database
             const newPerson = new People({
                 name: input.name,
                 birthday: input.birthday,
@@ -64,54 +65,40 @@ export const resolvers = {
             newPerson.save()
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
 
-            const family = await Families.findById(newPerson.family)
-            if (!family) {
-                throw new Error
-            }
-            family.members.push(newPerson.id)
-
-            Families.updateOne({ _id: family.id }, family, { new: true })
+            // push person.id to family.members
+            // (could potentially use findOneAndUpdate as this also returns family)
+            await Families.updateOne({ _id: newPerson.family }, { "$push": { "members": { _id: newPerson.id }}})
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
 
-            const returnPerson = {
-                id: newPerson.id,
-                name: newPerson.name,
-                birthday: newPerson.birthday,
-                events: newPerson.events,
-                colour: newPerson.colour,
-                family: family
-            }
-            
-            return returnPerson
+            // return person to be displayed
+            return People.findById(newPerson.id)
+                .populate({ path: 'family' })
+                .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
         },
         updatePerson: async (root: any, { input }: any) => {
+            // todo: validation for family and events (can or cannot change)
             await People.findOneAndUpdate({ _id: input.id }, input, { new: true })
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message) })
 
             return await People.findById(input.id)
-                .populate('family')
+                .populate({ path: 'family' }).populate({ path: 'events' })
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message) }); 
         },
         deletePerson: async (root: any, { id }: any) => {
+            // todo: delete person from events
+
+            // get person to use person.family to delete from family.members
             const person = await People.findById(id)
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
             if (!person) {
                 return ('Person not found');
             }
 
+            await Families.updateOne({ _id: person.family }, { "$pull": { "members": person.id }});
+
+            // delete person
             await People.deleteOne({ _id: id })
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
-
-            // const family = await Families.findById(person.family)
-            //     .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
-            // if (!family) {
-            //     return ('Family not found')
-            // }
-            // family.members.pull(id);
-            // family.save()
-            //     .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
-
-            await Families.updateOne({ _id: person.family }, { "$pull": { "members": { _id: person.id }}});
 
             return ('Successfully deleted person');
         },
@@ -160,7 +147,7 @@ export const resolvers = {
 
             // Families.updateOne({ _id: family.id }, family, { new: true }).catch((error) => {console.log("error! Mutation Request failed" + error.message)})
 
-            await Families.updateOne({ _id: newEvent.family }, { "$push": { "members": { _id: newEvent.id }}});
+            await Families.updateOne({ _id: newEvent.family }, { "$push": { "events": { _id: newEvent.id }}});
 
             return returnEvent;
         },
