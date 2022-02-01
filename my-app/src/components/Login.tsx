@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom'
 
-function Login():JSX.Element {
+function Login({onLoginSetFamily}):JSX.Element {
     return(
         <>
                 <form className="login">
