@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap');
+
 .App {
   text-align: center;
 }
@@ -40,12 +42,82 @@
 /* ------------------------------------------------------------ */
 /* Sign up/Login page */
 
+* {
+  /* font-family: Arial, Helvetica, sans-serif; */
+  font-family: 'Roboto', sans-serif;
+}
+
 .signup,
 .login {
   display: flex;
   flex-direction: column;
   justify-content: center;
   margin: 2rem;
+  align-items: center;
+}
+
+@media (min-width: 320px){
+
+  .loginbtn {
+    border-radius: 10px;
+    height: 2.5rem;
+    width: 50%;
+    background: #FAC710;
+    border: none;
+    font-size: 18px;
+    margin: 0.5rem 0 2rem 0;
+  }
+
+  .remember-div {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 3rem;
+    align-items: center;
+  }
+
+  .text-input {
+    width: 100%;
+    margin-top: 1rem;
+    border-radius: 10px;
+    border: 1px solid black;
+    height: 1.5rem;
+  }
+
+  .login-input-label {
+    font-size: 110%;
+  }
+
+  .signup-link {
+    text-decoration: none;
+  }
+ 
+}
+
+@media (min-width: 768px) {
+  .text-input {
+    width: 80%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .text-input {
+    width: 40%;
+  }
+
+  .login-title {
+    font-size: 3rem;
+  }
+
+  .login-input-label {
+    font-size: 120%;
+  }
+
+  .loginbtn {
+    width: 20%;
+  }
+
 }
 
 .signup > h1,
@@ -54,9 +126,9 @@
   margin: 0.2rem;
 }
 
-label {
+/* label {
   margin-bottom: 0.2rem;
-}
+} */
 
 input[type="text"],
 input[type="date"],
@@ -79,10 +151,18 @@ select
 /* ------------------------------------------------------------ */
 /* Homepage */
 
+* {
+  background: #f7f7f8;
+}
+
 #hp {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-around;
+  background: #f7f7f8;
+  height: 50rem;
+  border: 1px solid red;
 }
 
 #hp-header {
@@ -95,6 +175,7 @@ select
   text-align: center;
   text-decoration: none;
   color: #fff;
+  border-radius: 5rem;
 }
 
 .hp-signup {
@@ -104,6 +185,12 @@ select
 
 .hp-login {
   background: #FAC710;
+}
+
+@media (min-width: 320px) {
+  #hp {
+    height: 45rem;
+  }
 }
 
 /* ------------------------------------------------------------ */
