@@ -1,7 +1,7 @@
 
 import e from 'express';
 import React, { useState } from 'react';
-import { gql, useMutation } from '@apollo/client';        
+import { gql, useMutation, useLazyQuery } from '@apollo/client';        
 import bcrypt from 'bcryptjs';
 
 const CREATE_FAMILY = gql`
@@ -12,6 +12,14 @@ const CREATE_FAMILY = gql`
         }
     }
 `;
+
+const GET_FAMILY = gql`
+    query GetFamily($email: String) {
+        getOneFamily(email: $email) {
+            email
+        }
+    }
+    `;
 
 function validateEmail (email: string) {
     const regexp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -37,8 +45,9 @@ function SignUp(): any {
     const [errorPwdMsg, setErrorPwdMsg] = useState("");
     const [repwdError, setRepwdError] = useState(false)
 
+    const [getFamily, {loading, error, data}] = useLazyQuery(GET_FAMILY);
+    const [createFamily] = useMutation(CREATE_FAMILY);
 
-    const [createFamily, { data, loading, error }] = useMutation(CREATE_FAMILY);
 
     if (loading) return 'Submitting...';
     if (error) return `Submission error! ${error.message}`;
@@ -126,6 +135,14 @@ function SignUp(): any {
 
                 <button type="submit" className="signupbtn">Sign Up</button>
             </form>
+            <div>
+                show data
+            {data?.email}
+            </div>
+            <button onClick={(e) => {
+                e.preventDefault();
+                getFamily({variables: {email: email}})}}
+                >testing</button>
         </>
     );
 }
