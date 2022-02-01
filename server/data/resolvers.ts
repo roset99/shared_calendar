@@ -67,7 +67,8 @@ export const resolvers = {
 
             // push person.id to family.members
             // (could potentially use findOneAndUpdate as this also returns family)
-            await Families.updateOne({ _id: newPerson.family }, { "$push": { "members": { _id: newPerson.id }}})
+            const familyId = newPerson.family;
+            await Families.updateOne({ _id: familyId }, { "$push": { "members": { _id: newPerson.id }}})
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
 
             // return person to be displayed
@@ -85,16 +86,22 @@ export const resolvers = {
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message) }); 
         },
         deletePerson: async (root: any, { id }: any) => {
-            // todo: delete person from events
-
-            // get person to use person.family to delete from family.members
+            // get person from db
             const person = await People.findById(id)
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
             if (!person) {
                 return ('Person not found');
             }
 
-            await Families.updateOne({ _id: person.family }, { "$pull": { "members": person.id }});
+            // remove person from events attendees
+            for (let i = 0; i < person.events.length; i++) {
+                const eventId = person.events[i];
+                await Events.updateOne({ _id: eventId }, { "$pull": { "attendees": person.id }});
+            }
+
+            // remove person from family.members
+            const familyId = person.family;
+            await Families.updateOne({ _id: familyId }, { "$pull": { "members": person.id }});
 
             // delete person
             await People.deleteOne({ _id: id })
@@ -131,7 +138,8 @@ export const resolvers = {
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
 
             // add event to family.events
-            await Families.updateOne({ _id: newEvent.family }, { "$push": { "events": { _id: newEvent.id }}});
+            const familyId = newEvent.family;
+            await Families.updateOne({ _id: familyId }, { "$push": { "events": { _id: newEvent.id }}});
 
             return Events.findById(newEvent.id)
                 .populate({ path: 'attendees', populate: { path: 'family' }})
@@ -185,7 +193,8 @@ export const resolvers = {
                 .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
 
             // remove event form family.events
-            await Families.updateOne({ _id: event.family }, { "$pull": { "events": event.id }});
+            const familyId = event.family;
+            await Families.updateOne({ _id: familyId }, { "$pull": { "events": event.id }});
 
             // remove from person.events
             for (let i = 0; i < event.attendees.length; i++) {
