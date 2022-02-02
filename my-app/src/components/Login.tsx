@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react';
 import bcrypt from "bcryptjs"
 
@@ -7,6 +7,8 @@ import bcrypt from "bcryptjs"
 const salt = bcrypt.genSaltSync(10);
 
 function Login(onLoginSetFamily: any):JSX.Element {
+    const navigate = useNavigate()
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [hashed, setHashed] = useState("");
@@ -14,6 +16,8 @@ function Login(onLoginSetFamily: any):JSX.Element {
     const handleForm = (e: React.FormEvent) => {
         e.preventDefault();
         
+
+        navigate("/month-calendar");
     }
 
     const handleEmail = (e: any) => {
