@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import './CreatePersonComponent.css';
+import { Link } from 'react-router-dom';
 
 const CREATE_PERSON = gql`
     mutation CreatePerson($input: PersonInput) {
@@ -48,7 +49,6 @@ const CreatePerson: any = ({ }) => {
     const [colour, setColour] = useState<string>("");
     const [family, setFamily] = useState<[]>([]);
     const [createPerson, { data: createPersonData, loading: personLoading, error: personError }] = useMutation(CREATE_PERSON);
-    //const [familyData, setFamilyData] = useState<[]>([]);
 
 
     const colours: string[] = ["ffadad", "ffd6a5", "fdffb6", "caffbf", "a0c4ff", "bdb2ff", "ffc6ff"];
@@ -96,8 +96,9 @@ const CreatePerson: any = ({ }) => {
     }
 
 
+
     return (
-        <>
+        <section className="create-person-container">
             <form id="add-person" onSubmit={addPerson} className="form" >
                 <h1>Add family member</h1>
 
@@ -133,10 +134,10 @@ const CreatePerson: any = ({ }) => {
 
                 </select>  */}
 
-                <button type="submit" className="submit-person" id="submit-btn" >Submit Person</button>
+               <Link to="/month-calendar"> <button type="submit" className="submit-person" id="submit-btn" >Submit Person</button></Link>
             </form >
-
-        </>
+                <Link to="/month-calendar" className="month-cal-link">Go to Monthly Calendar</Link>
+        </section>
     )
 }
 export default CreatePerson;
