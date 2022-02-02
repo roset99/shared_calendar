@@ -23,6 +23,7 @@ interface Props {
     // passed down to be inserted into addEvent request
     members: any;
     currentFamily: any;
+    familyMembers: any
 
     // whether is being displayed from month or day page
     day: string;
@@ -32,7 +33,7 @@ interface Props {
 // || ==================== Component ==================== ||
 
 // const AddEvent: any = ({ show, onClose, family, members, day, refreshEvents }: Props) => {
-const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily }: Props) => {
+const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembers }: Props) => {
     
     const [title, setTitle] = useState<string>("");
     const [date, setDate] = useState<string>("");
@@ -77,6 +78,11 @@ const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily }: Props) =>
             .then(result => console.log(result))
             .then(() => refreshEvents())
     }
+    // const memberDropdown = familyMembers.map(member => {
+        
+    //         <option value={member.id}>{member.name}</option>
+       
+    // })
 
     // || ========== Render return ========== ||
 
@@ -103,6 +109,10 @@ const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily }: Props) =>
 
             <label htmlFor='endTime'>End Time</label>
             <input type="text" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+            {/* <select name="attendees" id="attendees">
+                <option value=""></option>
+                {memberDropdown}
+            </select> */}
 
             <button type="submit">Submit</button>
         </form>

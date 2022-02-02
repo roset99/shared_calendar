@@ -34,6 +34,34 @@ query GetEventsByFamily($family: FamilyInput){
     
     }
 }`;
+const GET_FAMILY = gql`
+query GetFamilyById($id: ID){
+    getFamilyById(id: $id){
+        id
+        name
+        email
+        members{
+            id
+            name
+            birthday
+            colour
+        }
+        events{
+            id
+            attendees {
+                name
+                colour
+            }
+            date 
+            startTime
+            endTime
+            title 
+        }
+    }
+        
+
+    }
+`
 
 const MonthlyCalendar = ({currentFamily}: any): any => {
     
@@ -42,7 +70,7 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
     const [events, setEvents] = useState<any>([]);
     const [eventFormShow, setEventFormShow] = useState<boolean>(false);
-    const { loading, error, data, refetch } = useQuery(GET_EVENTS, {variables: {family: currentFamily}});
+    const { loading, error, data, refetch } = useQuery(GET_FAMILY, {variables: {id: currentFamily.id}});
     const [family, setFamily] = useState<any>(null);
     const [familyMembers, setFamilyMembers] = useState<any[]>([]);
     const [dateClicked, setDateClicked] = useState<string>("");
@@ -56,28 +84,24 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
     
     //     return JSON.parse(stored);
     //   }
-
-    // const accessFamily = () => {
-    //     const familyFromStore = getSessionStorageOrDefault("family", null);
-    //     setFamily(familyFromStore);
-    // }
     
-    // const findFamilyMembers = () => {
-    //     if (family !== null) {
-    //         setFamilyMembers(family.members);
-    //     }
+    const findFamilyMembers = () => {
+        if (data !== null) {
+            setFamilyMembers(data.getFamilyById.members);
+        }
         
-    // }
+    }
 
-    // useEffect(() => {
-    //     accessFamily();
-    //     findFamilyMembers();
-    // }, []);
+    useEffect(() => {
+        if (!loading && !error){
+            findFamilyMembers();
+        }
+    }, []);
 
     const getEvents = (): void => {
         if (!loading && !error ){
-            setEvents(data.getEventsByFamily);
-            console.log("this is data ", data.getEventsByFamily);
+            setEvents(data.getFamilyById.events);
+            console.log("this is data ", data.getFamilyById.events);
             
         }  
     }
@@ -89,8 +113,8 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
     const refreshEvents = (): void => {
         refetch();
         if (!loading && !error ){
-            setEvents(data.getEventsByFamily);
-            console.log("this is data ", data.getEventsByFamily);
+            setEvents(data.getFamilyById.events);
+            console.log("this is data ", data.getFamilyById.events);
             
         } 
     }
@@ -220,7 +244,7 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
                 {monthDayComponents}
             </div>
             <div className={eventFormShow ? "event-form form-show" : "event-form form-hidden"}>
-                <AddEvent onClose={onClickShowForm} day={""} refreshEvents={refreshEvents} currentFamily={currentFamily}/>
+                <AddEvent onClose={onClickShowForm} day={""} refreshEvents={refreshEvents} currentFamily={currentFamily} familyMembers={familyMembers}/>
             </div>
             <div className="float" onClick={() => onClickShowForm()}>
                 <i className="fa fa-plus my-float"></i>
