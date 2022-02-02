@@ -6,6 +6,7 @@ import { gql, useMutation } from '@apollo/client';
 const CREATE_FAMILY = gql`
     mutation CreateFamily($input: FamilyInput) {
         createFamily(input: $input){
+            id
             email
             password
         }
@@ -22,7 +23,7 @@ function validatePassword (pwd: string) {
     return regexp.test(pwd);
 }
 
-function SignUp(): any {
+function SignUp({onLoginSetFamily}:any): any {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -81,7 +82,8 @@ function SignUp(): any {
                 }
             } 
         });
-
+        
+        onLoginSetFamily({id: data.createFamily.id});
     }
 
     const handleEmail = (e: any) => {

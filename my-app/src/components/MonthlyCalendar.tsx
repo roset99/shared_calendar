@@ -1,5 +1,5 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useState } from 'react';
 import MonthDayComponent from './MonthDayComponent';
 import './MonthlyCalendar.css';
 import {Link, Route} from 'react-router-dom';
@@ -9,7 +9,7 @@ import DailyCalendar from './DailyCalendar';
 
 const GET_EVENTS = gql`
 query{
-    getEventsByFamily (family: {id: "61f3c4912f44ea46c45ef30b"}){
+    getEventsByFamily (family: {id: "61f962e8c0222225708864e0"}){
          
         id
         family {
@@ -26,7 +26,9 @@ query{
             colour
         }
         date 
-        time
+        startTime
+        endTime
+        title
     
     
     }
@@ -39,11 +41,36 @@ const MonthlyCalendar = (): any => {
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
     const [events, setEvents] = useState<any>([]);
     const { loading, error, data } = useQuery(GET_EVENTS);
+    const [family, setFamily] = useState<any>(null);
+    const [familyMembers, setFamilyMembers] = useState<any[]>([]);
     const [dateClicked, setDateClicked] = useState<string>("");
     
+    // function getSessionStorageOrDefault(key: string, defaultValue: null) {
+    //     const stored = sessionStorage.getItem(key);
     
+    //     if (!stored) {
+    //       return defaultValue;
+    //     }
+    
+    //     return JSON.parse(stored);
+    //   }
 
+    // const accessFamily = () => {
+    //     const familyFromStore = getSessionStorageOrDefault("family", null);
+    //     setFamily(familyFromStore);
+    // }
     
+    // const findFamilyMembers = () => {
+    //     if (family !== null) {
+    //         setFamilyMembers(family.members);
+    //     }
+        
+    // }
+
+    // useEffect(() => {
+    //     accessFamily();
+    //     findFamilyMembers();
+    // }, []);
 
     const getEvents = (): void => {
         if (!loading && !error ){
@@ -59,18 +86,18 @@ const MonthlyCalendar = (): any => {
         return [d.getMonth(), d.getFullYear()];
     }
 
-    const increaseMonth = async () => {
+    const increaseMonth = () => {
         console.log(month);
         if (month === 11) {
-            const newMonthIndex = await 0;
+            const newMonthIndex = 0;
             const newYear = year + 1;
             setYear(newYear);
             setMonth(newMonthIndex);   
             console.log(month);     
         } else {
-            const newMonthIndex = await month + 1;
+            const newMonthIndex = month + 1;
             setMonth(newMonthIndex);
-            console.log(month);
+            console.log(newMonthIndex);
         }
         
     }
@@ -114,7 +141,20 @@ const MonthlyCalendar = (): any => {
     
 
     const monthDayComponents = daysInMonth.map((index) => {
-        const date = index +"/" + month + 1 + "/" + year;
+        let monthFormat = "";
+        let dayFormat = "";
+        if (month < 10 ){
+           const month1 = month + 1; 
+           monthFormat = "0" + month1;
+        } else {
+            monthFormat = month.toString();
+        } 
+        if (index < 10 ){ 
+            dayFormat = "0" + index;
+         } else {
+             dayFormat = index.toString();
+         } 
+        const date = dayFormat +"/" + monthFormat + "/" + year;
         let event: any[] = [];
         if (events === []) {
             return <Link className="days-of-month" to="/days" state={{date: date}}><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>

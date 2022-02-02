@@ -29,7 +29,7 @@ const DailyCalendar = () => {
     const eventsList = events.map((item : any) => {
         if (item.date === date && item.attendees.map((att: any) => {return att.name}).includes(person.name)){
             return(
-                <p>{item.time + ": " + item.attendees[0]} </p>
+                <p>{item.startTime + " - " + item.endTime + ": " + item.title} </p>
             )
         }
     })    
