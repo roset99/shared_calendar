@@ -42,7 +42,7 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
     const [events, setEvents] = useState<any>([]);
     const [eventFormShow, setEventFormShow] = useState<boolean>(false);
-    const { loading, error, data, refetch } = useQuery(GET_EVENTS, {variables: {FamilyInput: {id: currentFamily.id}}});
+    const { loading, error, data, refetch } = useQuery(GET_EVENTS, {variables: {family: currentFamily}});
     const [family, setFamily] = useState<any>(null);
     const [familyMembers, setFamilyMembers] = useState<any[]>([]);
     const [dateClicked, setDateClicked] = useState<string>("");
@@ -220,7 +220,7 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
                 {monthDayComponents}
             </div>
             <div className={eventFormShow ? "event-form form-show" : "event-form form-hidden"}>
-                <AddEvent onClose={onClickShowForm} day={""} refreshEvents={refreshEvents}/>
+                <AddEvent onClose={onClickShowForm} day={""} refreshEvents={refreshEvents} currentFamily={currentFamily}/>
             </div>
             <div className="float" onClick={() => onClickShowForm()}>
                 <i className="fa fa-plus my-float"></i>
