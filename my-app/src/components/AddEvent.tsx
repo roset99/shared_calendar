@@ -21,8 +21,8 @@ interface Props {
     onClose: () => void;
 
     // passed down to be inserted into addEvent request
-    family: any;
     members: any;
+    currentFamily: any;
 
     // whether is being displayed from month or day page
     day: string;
@@ -32,7 +32,7 @@ interface Props {
 // || ==================== Component ==================== ||
 
 // const AddEvent: any = ({ show, onClose, family, members, day, refreshEvents }: Props) => {
-const AddEvent: any = ({ onClose, day, refreshEvents }: Props) => {
+const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily }: Props) => {
     
     const [title, setTitle] = useState<string>("");
     const [date, setDate] = useState<string>("");
@@ -55,7 +55,7 @@ const AddEvent: any = ({ onClose, day, refreshEvents }: Props) => {
 
         const newEvent: EventInputInterface = {
             title: title,
-            family: { id: "61f2dae90357581390862808" },
+            family: currentFamily,
             attendees: [],
             date: date,
             startTime: startTime,
