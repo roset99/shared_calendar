@@ -1,7 +1,8 @@
 
 import e from 'express';
 import React, { useState } from 'react';
-import { gql, useMutation } from '@apollo/client';        
+import { gql, useMutation, useLazyQuery } from '@apollo/client';        
+import bcrypt from 'bcryptjs';
 
 const CREATE_FAMILY = gql`
     mutation CreateFamily($input: FamilyInput) {
@@ -19,7 +20,7 @@ function validateEmail (email: string) {
   }
 
 function validatePassword (pwd: string) {
-    const regexp = /"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"/;
+    const regexp = /^(?=.*\d)(?=.*[!@#$%^&*.])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
     return regexp.test(pwd);
 }
 
@@ -28,6 +29,7 @@ function SignUp({onLoginSetFamily}:any): any {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [repassword, setRepassword] = useState("");
+    const [hashed, setHashed] = useState("");
 
     const [emailError, setEmailError] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
@@ -36,8 +38,8 @@ function SignUp({onLoginSetFamily}:any): any {
     const [errorPwdMsg, setErrorPwdMsg] = useState("");
     const [repwdError, setRepwdError] = useState(false)
 
+    const [createFamily, {data, loading, error}] = useMutation(CREATE_FAMILY);
 
-    const [createFamily, { data, loading, error }] = useMutation(CREATE_FAMILY);
 
     if (loading) return 'Submitting...';
     if (error) return `Submission error! ${error.message}`;
@@ -46,6 +48,9 @@ function SignUp({onLoginSetFamily}:any): any {
 
     const doStuff = (e: React.FormEvent) => {
         e.preventDefault();
+
+        console.log(email, validateEmail(email));
+        console.log(password, validatePassword(password))
 
         if(email === "" || email === null) {
             setEmailError(true);
@@ -58,7 +63,7 @@ function SignUp({onLoginSetFamily}:any): any {
             invalid = true;
         }
 
-        if(!validateEmail(password)) {
+        if(!validatePassword(password)) {
             setPwdError(true);
             setErrorPwdMsg("Password must contain: Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character")
             invalid = true;
@@ -73,12 +78,11 @@ function SignUp({onLoginSetFamily}:any): any {
             return
         }
 
-
         createFamily({ 
             variables: {
                 input: { 
                     email: email,
-                    password: password
+                    password: hashed
                 }
             } 
         });
@@ -86,17 +90,24 @@ function SignUp({onLoginSetFamily}:any): any {
         onLoginSetFamily({id: data.createFamily.id});
     }
 
+    //Generate salt to always be added to password
+    const salt = bcrypt.genSaltSync(10);
+
+
     const handleEmail = (e: any) => {
         setEmail(e.target.value);
     }
 
     const handlePassword = (e: any) => {
         setPassword(e.target.value);
+        setHashed(bcrypt.hashSync(e.target.value, salt));
     }
 
     const handleRepassword = (e: any) => {
         setRepassword(e.target.value);
     }
+
+
 
     return (  
         <>
