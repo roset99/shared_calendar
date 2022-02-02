@@ -1,3 +1,5 @@
+import bcrypt from 'bcrypt';
+
 import { Families, People, Events } from './dbConnectors';
 
 // || ========== Resolver Map ========== ||
@@ -195,7 +197,7 @@ export const resolvers = {
             const newFamily = new Families({
                 name: input.name,
                 email: input.email,
-                password: input.password,
+                password: await bcrypt.hash(input.password, 12), // hash password
                 members: input.members,
                 events: input.events
             });
