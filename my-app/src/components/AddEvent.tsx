@@ -26,11 +26,13 @@ interface Props {
 
     // whether is being displayed from month or day page
     day: string;
+    refreshEvents: () => void;
 }
 
 // || ==================== Component ==================== ||
 
-const AddEvent: any = ({ show, onClose, family, members, day }: Props) => {
+// const AddEvent: any = ({ show, onClose, family, members, day, refreshEvents }: Props) => {
+const AddEvent: any = ({ onClose, day, refreshEvents }: Props) => {
     
     const [title, setTitle] = useState<string>("");
     const [date, setDate] = useState<string>("");
@@ -44,7 +46,7 @@ const AddEvent: any = ({ show, onClose, family, members, day }: Props) => {
     if (createEventLoading) return 'Submitting...';
     if (createEventError) return `Submission error! ${createEventError.message}`;
 
-    if(!show) { return null; } // returns null if popup is not to be shown
+    //if(!show) { return null; }  returns null if popup is not to be shown
 
     // || ========== Functions ========== ||
 
@@ -73,6 +75,7 @@ const AddEvent: any = ({ show, onClose, family, members, day }: Props) => {
             } 
         })
             .then(result => console.log(result))
+            .then(() => refreshEvents())
     }
 
     // || ========== Render return ========== ||

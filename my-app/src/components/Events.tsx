@@ -62,7 +62,7 @@ const Events: any = () => {
     return (
       <>
         <button onClick={() => setShow(true)}>Add an Event</button>
-        <AddEvent event={event} setEvent={setEvent} handleAddEvent={handleAddEvent} onClose={() => {setShow(false)}} show={show} family={{}} members={[]}/>
+        {/* <AddEvent event={event} setEvent={setEvent} handleAddEvent={handleAddEvent} onClose={() => {setShow(false)}} show={show} family={{}} members={[]}/> */}
         <EventsList events={events} setEvents={setEvents} />
       </>
     )

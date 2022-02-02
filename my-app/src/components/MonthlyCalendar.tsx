@@ -5,11 +5,12 @@ import './MonthlyCalendar.css';
 import {Link, Route} from 'react-router-dom';
 import {gql, useQuery} from '@apollo/client';
 import DailyCalendar from './DailyCalendar';
+import AddEvent from './AddEvent';
 
 
 const GET_EVENTS = gql`
-query{
-    getEventsByFamily (family: {id: "61f962e8c0222225708864e0"}){
+query GetEventsByFamily($family: FamilyInput){
+    getEventsByFamily (family: $family){
          
         id
         family {
@@ -34,14 +35,14 @@ query{
     }
 }`;
 
-const MonthlyCalendar = (): any => {
+const MonthlyCalendar = ({currentFamily}: any): any => {
     
     const [month, setMonth] = useState<number>(0);
     const [year, setYear] = useState<number>(0);
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
     const [events, setEvents] = useState<any>([]);
     const [eventFormShow, setEventFormShow] = useState<boolean>(false);
-    const { loading, error, data } = useQuery(GET_EVENTS);
+    const { loading, error, data, refetch } = useQuery(GET_EVENTS, {variables: {FamilyInput: {id: currentFamily.id}}});
     const [family, setFamily] = useState<any>(null);
     const [familyMembers, setFamilyMembers] = useState<any[]>([]);
     const [dateClicked, setDateClicked] = useState<string>("");
@@ -84,6 +85,15 @@ const MonthlyCalendar = (): any => {
     const onClickShowForm = () => {
         setEventFormShow(!eventFormShow);
     };
+
+    const refreshEvents = (): void => {
+        refetch();
+        if (!loading && !error ){
+            setEvents(data.getEventsByFamily);
+            console.log("this is data ", data.getEventsByFamily);
+            
+        } 
+    }
 
     const findCurrentMonthAndYear = (): number[] => {
         const d = new Date();
@@ -209,8 +219,8 @@ const MonthlyCalendar = (): any => {
             <div className="month-day-components">
                 {monthDayComponents}
             </div>
-            <div className={eventFormShow ? "event-form show" : "event-form hidden"}>
-
+            <div className={eventFormShow ? "event-form form-show" : "event-form form-hidden"}>
+                <AddEvent onClose={onClickShowForm} day={""} refreshEvents={refreshEvents}/>
             </div>
             <div className="float" onClick={() => onClickShowForm()}>
                 <i className="fa fa-plus my-float"></i>

@@ -54,3 +54,9 @@
 .my-float {
   margin-top: 22px;
 }
+.form-show{
+  display: block;
+}
+.form-hidden{
+  display: none;
+}
