@@ -8,6 +8,7 @@ import SignUp from './components/Signup';
 import Login from "./components/Login"
 import Events from './components/Events';
 import DailyCalendar from './components/DailyCalendar';
+import CreatePerson from './components/CreatePerson';
 
 function App() {
 
@@ -41,6 +42,7 @@ function App() {
           <Route path="/login" element={<Login onLoginSetFamily={onLoginSetFamily}/>} /> 
           <Route path="/events" element={<Events/>} /> 
           <Route path="/days" element={<DailyCalendar/>} /> 
+          <Route path="/members" element={<CreatePerson currentFamily={currentFamily} />} />
       </Routes>
     </BrowserRouter>
   );
