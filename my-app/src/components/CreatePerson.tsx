@@ -25,7 +25,7 @@ const CreatePerson: any = ({ currentFamily}: any) => {
     const [colour, setColour] = useState<string>("");
     const [createPerson, { data: createPersonData, loading: personLoading, error: personError }] = useMutation(CREATE_PERSON);
 
-    const colours: string[] = ["ffadad", "ffd6a5", "fdffb6", "caffbf", "a0c4ff", "bdb2ff", "ffc6ff"];
+    const coloursObj: {}[] = [{value:"ffadad", text:"Red"}, {value:"ffd6a5", text:"Orange"}, {value: "fdffb6", text:"Yellow"}, {value: "caffbf", text:"Green"}, {value:"a0c4ff", text:"Blue"}, {value: "bdb2ff", text:"Purple"}, {value:"ffc6ff", text:"Pink"}];
 
     if (personLoading) return 'Submitting...';
     if (personError) return `Submission error! ${personError.message}`;
@@ -56,6 +56,7 @@ const CreatePerson: any = ({ currentFamily}: any) => {
 
     const handleColour = (e: any) => {
         setColour(e.target.value)
+        console.log("colour is", colour)
     }
 
     return (
@@ -72,8 +73,8 @@ const CreatePerson: any = ({ currentFamily}: any) => {
                 <label htmlFor="colour">Choose colour</label>
                 <select name="colour" id="colour" onChange={handleColour} className="select-input">
                     <option value="">Select colour</option>
-                    {colours.map((c: any, i) => (
-                        <option key={i}>{c}</option>
+                    {coloursObj.map(({value, text}: any) => (
+                        <option key={value} value={value}>{text}</option>
                     ))}
                 </select>
                <button type="submit" className="submit-person-btn" id="submit-btn" >Submit Person</button>
