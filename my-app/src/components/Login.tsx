@@ -6,9 +6,7 @@ import bcrypt from "bcryptjs"
 
 const salt = bcrypt.genSaltSync(10);
 
-
-
-function Login():JSX.Element {
+function Login(onLoginSetFamily: any):JSX.Element {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [hashed, setHashed] = useState("");
