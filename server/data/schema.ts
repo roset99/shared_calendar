@@ -24,7 +24,7 @@ export const typeDefs = gql`
 
     type Family {
         id: ID
-        familyName: String
+        name: String
         email: String
         password: String
         members: [Person]
@@ -63,7 +63,7 @@ export const typeDefs = gql`
 
     input FamilyInput {
         id: ID
-        familyName: String
+        name: String
         email: String
         password: String
         members: [PersonInput]

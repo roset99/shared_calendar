@@ -13,7 +13,7 @@ async function main(): Promise<void> {
 // || ========== Schemas and Interfaces ========== ||
 
 export interface Family {
-    familyName: string;
+    name: string;
     email: string;
     password: string;
     members: Types.ObjectId[];
@@ -21,7 +21,7 @@ export interface Family {
 }
 
 const familySchema = new Schema<Family>({
-    familyName: { type: String },
+    name: { type: String },
     email: { type: String },
     password: { type: String },
     members: [{ type: Types.ObjectId, ref: 'people' }],

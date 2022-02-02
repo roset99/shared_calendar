@@ -193,7 +193,7 @@ export const resolvers = {
         createFamily: async (root: any, { input }: any) => {
             // create family db object
             const newFamily = new Families({
-                familyName: input.familyName,
+                name: input.name,
                 email: input.email,
                 password: input.password,
                 members: input.members,
