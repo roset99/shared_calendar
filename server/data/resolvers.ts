@@ -1,3 +1,5 @@
+import bcrypt from 'bcrypt';
+
 import { Families, People, Events } from './dbConnectors';
 
 // || ========== Resolver Map ========== ||
@@ -193,9 +195,9 @@ export const resolvers = {
         createFamily: async (root: any, { input }: any) => {
             // create family db object
             const newFamily = new Families({
-                familyName: input.familyName,
+                name: input.name,
                 email: input.email,
-                password: input.password,
+                password: await bcrypt.hash(input.password, 12), // hash password
                 members: input.members,
                 events: input.events
             });
