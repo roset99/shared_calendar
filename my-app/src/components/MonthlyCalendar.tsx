@@ -40,6 +40,7 @@ const MonthlyCalendar = (): any => {
     const [year, setYear] = useState<number>(0);
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
     const [events, setEvents] = useState<any>([]);
+    const [eventFormShow, setEventFormShow] = useState<boolean>(false);
     const { loading, error, data } = useQuery(GET_EVENTS);
     const [family, setFamily] = useState<any>(null);
     const [familyMembers, setFamilyMembers] = useState<any[]>([]);
@@ -80,6 +81,9 @@ const MonthlyCalendar = (): any => {
         }  
     }
 
+    const onClickShowForm = () => {
+        setEventFormShow(!eventFormShow);
+    };
 
     const findCurrentMonthAndYear = (): number[] => {
         const d = new Date();
@@ -205,6 +209,15 @@ const MonthlyCalendar = (): any => {
             <div className="month-day-components">
                 {monthDayComponents}
             </div>
+            <div className={eventFormShow ? "event-form show" : "event-form hidden"}>
+
+            </div>
+            <div className="float" onClick={() => onClickShowForm()}>
+                <i className="fa fa-plus my-float"></i>
+            </div>
+            
+            
+
             
         </div>
         

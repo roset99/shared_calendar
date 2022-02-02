@@ -8,6 +8,7 @@ const DailyCalendar = () => {
     let location: any = useLocation();
     const [date, setDate] = useState("");
     const [events, setEvents] = useState<any>([]);
+    const [eventFormShow, setEventFormShow] = useState<boolean>(false);
 
     useEffect(() => {
         setDate(location.state.date);
@@ -25,6 +26,10 @@ const DailyCalendar = () => {
         console.log("this is events in dailycalendar: ", events);
     }, [events]);
     
+    const onClickShowForm = () => {
+        setEventFormShow(!eventFormShow);
+    };
+
     const attendeeList = peopleTest.map( (person: any) => {
     const eventsList = events.map((item : any) => {
         if (item.date === date && item.attendees.map((att: any) => {return att.name}).includes(person.name)){
@@ -50,6 +55,12 @@ const DailyCalendar = () => {
             <section className="event-lists">
                 {attendeeList}
             </section>
+            <div className={eventFormShow ? "event-form show" : "event-form hidden"}>
+
+            </div>
+            <div className="float" onClick={() => onClickShowForm()}>
+                <i className="fa fa-plus my-float"></i>
+            </div>
         </div>
     )
 };
