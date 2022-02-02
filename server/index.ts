@@ -1,18 +1,12 @@
-import express from 'express';
-import cors from 'cors';
-import { graphqlHTTP }  from 'express-graphql';
-import { schema } from './data/schema';
+import { ApolloServer } from 'apollo-server'; 
 
-const app = express();
+import { typeDefs } from './data/schema';
+import { resolvers } from './data/resolvers';
 
-app.get('/', (req, res) => {
-    res.send('Graphql is amazing!');
-});
+// || ========== Apollo Server ========== ||
 
-app.use(cors());
-app.use('/graphql', graphqlHTTP({
-    schema: schema,
-    graphiql: true,
-}));
+const server = new ApolloServer({ typeDefs, resolvers });
 
-app.listen(8080, () => console.log('Running on server port localhost:8080/graphql'));
+server.listen().then(({ url }) => {
+    console.log(`🚀 Server ready at ${url}`);
+})

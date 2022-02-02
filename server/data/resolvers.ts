@@ -1,6 +1,7 @@
 import { Families, People, Events } from './dbConnectors';
 
-// resolver map
+// || ========== Resolver Map ========== ||
+
 export const resolvers = { 
     Query: {
         getAllFamilies: async () => {
