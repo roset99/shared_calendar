@@ -49,7 +49,7 @@ function SignUp({onLoginSetFamily}:any): any {
     
     let invalid = false;
 
-    const doStuff = (e: React.FormEvent) => {
+    const doStuff = async (e: React.FormEvent) => {
         e.preventDefault();
 
         console.log(email, validateEmail(email));
@@ -81,16 +81,20 @@ function SignUp({onLoginSetFamily}:any): any {
             return
         }
 
-        createFamily({ 
+        await createFamily({ 
             variables: {
                 input: { 
                     email: email,
                     password: hashed
                 }
             } 
-        });
+        })
+            .then((result) => {
+                // console.log(result)
+                onLoginSetFamily({ id: result.data.createFamily.id })
+            });
         
-        onLoginSetFamily({id: data.createFamily.id});
+        // await onLoginSetFamily({id: data.createFamily.id});
         navigate("/members");
     }
 
