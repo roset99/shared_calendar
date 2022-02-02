@@ -8,10 +8,12 @@ function Homepage(): JSX.Element {
   return (
     <section id="hp">
       <h1 id="hp-header">SHARED CALENDAR</h1>
+      <div className="hp-buttons-container">
       <Link className="hp-signup" to="/signup">Sign Up</Link>
       <Link className="hp-login" to="/login">Login</Link>
       <Link className="hp-events" to="/events">Events placeholder</Link> 
       <Link className="month-calendar" to="/month-calendar">Calendar Placeholder</Link>
+      </div>
     </section>
   );
 }

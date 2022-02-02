@@ -149,28 +149,32 @@ select
   width: 10%;
   align-self: center;
   border-radius: 2rem;
-  background: #fff;
+  background: #414bb2;
   border: 1px solid #777;
+  color: white;
+  font-weight: 800;
 }
 
 /* ------------------------------------------------------------ */
 /* Homepage */
 
 * {
-  background: #f7f7f8;
+  /* background: #f7f7f8; */
+  background: #d1e6d9;
 }
 
 #hp {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* justify-content: space-around; */
-  background: #f7f7f8;
-
+  justify-content: space-between;
+  /* background: #f7f7f8; */
+  /* border: 1px solid blue; */
 }
 
 #hp-header {
   text-align: center;
+  font-weight: 1500;
 }
 
 .hp-signup, .hp-login {
@@ -180,6 +184,7 @@ select
   text-decoration: none;
   color: #fff;
   border-radius: 5rem;
+  font-weight: 1000;
 }
 
 .hp-signup {
@@ -191,9 +196,28 @@ select
   background: #FAC710;
 }
 
+.month-calendar, .hp-events {
+  text-decoration: none;
+
+}
+
 @media (min-width: 320px) {
   #hp {
     height: 45rem;
+  }
+
+  .hp-buttons-container {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    /* border: 1px solid red; */
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  #hp-header {
+    font-size: 3rem;
+    margin-top: 7rem;
   }
 }
 /* ------------------------------------------------------------ */
