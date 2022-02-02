@@ -99,6 +99,10 @@ const CreatePerson: any = ({ }) => {
 
     return (
         <section className="create-person-container">
+            <div className="current-members">
+                <h1>Current family members</h1>
+                {/* map name and colour of existing members, if empty, return: no family members*/}
+            </div>
             <form id="add-person" onSubmit={addPerson} className="form" >
                 <h1>Add family member</h1>
 
