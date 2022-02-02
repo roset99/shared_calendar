@@ -1,52 +1,48 @@
 import { Families, People, Events } from './dbConnectors';
 
-// resolver map
+// || ========== Resolver Map ========== ||
+
 export const resolvers = { 
     Query: {
         getAllFamilies: async () => {
             return Families.find({})
-                .populate({ path:'members', populate: { path: 'events' }})
-                .populate({ path:'events', populate: { path: 'attendees' }});
+                .populate({ path: 'members', populate: { path: 'events' }})
+                .populate({ path: 'events', populate: { path: 'attendees' }});
         },
         getOneFamily: async (root: any, { email }: any) => {
             return Families.findOne({ email: email })
-                .populate({ path:'members', populate: { path: 'events' }})
-                .populate({ path: 'events', populate: {path: 'attendees'}})
-                .catch((error) => { console.log("error! Get Request failed" + error.message) });
+                .populate({ path: 'members', populate: { path: 'events' }})
+                .populate({ path: 'events', populate: { path: 'attendees' }});
         },
         getFamilyById: async (root: any, { id }: any) => {
             return Families.findById(id)
-                .populate({ path:'members', populate: { path: 'events' }})
-                .populate({ path: 'events', populate: {path: 'attendees'}})
-                .catch((error) => { console.log("error! Get Request failed" + error.message) });
+                .populate({ path: 'members', populate: { path: 'events' }})
+                .populate({ path: 'events', populate: { path: 'attendees' }});
         },
         getAllPeople: async () => {
             return People.find({})
-                .populate('family').populate('events')
-                .catch((error) => { console.log("error! Get Request failed" + error.message) });
+                .populate({ path: 'family', populate: { path: 'events' }})
+                .populate({ path: 'events', populate: { path: 'family' }});
         },
         getOnePerson: async (root: any, { id }: any) => {
             return People.findById(id)
-                .populate('family').populate('events')
-                .catch((error) => { console.log("error! Get Request failed" + error.message) });
+                .populate({ path: 'family', populate: { path: 'events' }})
+                .populate({ path: 'events', populate: { path: 'family' }});
         },
         getAllEvents: async () => {
             return Events.find({})
                 .populate({ path: 'attendees', populate: { path: 'family' }})
-                .populate({ path: 'family', populate: { path: 'members' }})
-                .catch((error) => { console.log("error! Get Request failed" + error.message) });
+                .populate({ path: 'family', populate: { path: 'members' }});
         },
         getOneEvent: async (root: any, { id }: any) => {
             return Events.findById(id)
                 .populate({ path: 'attendees', populate: { path: 'family' }})
-                .populate({ path: 'family', populate: { path: 'members' }})
-                .catch((error) => { console.log("error! Get Request failed" + error.message) });  
+                .populate({ path: 'family', populate: { path: 'members' }});
         },
         getEventsByFamily: async (root: any, { family }: any) => {
             return Events.find({family: family.id})
                 .populate({ path: 'attendees', populate: { path: 'family' }})
-                .populate({ path: 'family', populate: { path: 'members' }})
-                .catch((error) => { console.log("error! Get Request failed" + error.message) });
+                .populate({ path: 'family', populate: { path: 'members' }});
         },
     },
     Mutation: {
@@ -62,33 +58,27 @@ export const resolvers = {
             
             newPerson.id = newPerson._id;
 
-            newPerson.save()
-                .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
+            newPerson.save();
 
             // push person.id to family.members
             // (could potentially use findOneAndUpdate as this also returns family)
             const familyId = newPerson.family;
-            await Families.updateOne({ _id: familyId }, { "$push": { "members": { _id: newPerson.id }}})
-                .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
+            await Families.updateOne({ _id: familyId }, { "$push": { "members": { _id: newPerson.id }}});
 
             // return person to be displayed
             return People.findById(newPerson.id)
-                .populate({ path: 'family' })
-                .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
+                .populate({ path: 'family' });
         },
         updatePerson: async (root: any, { input }: any) => {
             // todo: validation for family and events (can or cannot change)
-            await People.findOneAndUpdate({ _id: input.id }, input, { new: true })
-                .catch((error) => { console.log("error! Mutation Request failed" + error.message) })
+            await People.findOneAndUpdate({ _id: input.id }, input, { new: true });
 
             return await People.findById(input.id)
-                .populate({ path: 'family' }).populate({ path: 'events' })
-                .catch((error) => { console.log("error! Mutation Request failed" + error.message) }); 
+                .populate({ path: 'family' }).populate({ path: 'events' });
         },
         deletePerson: async (root: any, { id }: any) => {
             // get person from db
-            const person = await People.findById(id)
-                .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
+            const person = await People.findById(id);
             if (!person) {
                 return ('Person not found');
             }
@@ -104,8 +94,7 @@ export const resolvers = {
             await Families.updateOne({ _id: familyId }, { "$pull": { "members": person.id }});
 
             // delete person
-            await People.deleteOne({ _id: id })
-                .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
+            await People.deleteOne({ _id: id });
 
             return ('Successfully deleted person');
         },
@@ -134,8 +123,7 @@ export const resolvers = {
             }
 
             // save event to database
-            await newEvent.save()
-                .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
+            await newEvent.save();
 
             // add event to family.events
             const familyId = newEvent.family;
@@ -182,15 +170,13 @@ export const resolvers = {
         },
         deleteEvent: async (root: any, { id }: any) => {
             // get event from database by id
-            const event = await Events.findById(id)
-                .catch((error) => { console.log("error! Mutation Request failed" + error.message) });            
+            const event = await Events.findById(id);          
             if (!event) {
-                throw new Error("Error")
+                throw new Error("Error");
             }
 
             // delete event from db
-            await Events.deleteOne({ _id: id })
-                .catch((error) => { console.log("error! Mutation Request failed" + error.message) });
+            await Events.deleteOne({ _id: id });
 
             // remove event form family.events
             const familyId = event.family;

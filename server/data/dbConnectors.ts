@@ -2,14 +2,6 @@ import { Schema, model, connect, Types } from 'mongoose';
 
 // || ========== Mongo connection ========== ||
 
-// -- old connection
-// mongoose.Promise = global.Promise;
-// mongoose.connect('mongodb://localhost/calendar', {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-// });
-
-// -- new connection
 main().catch(err => console.log(err));
 async function main(): Promise<void> {
     await connect('mongodb://localhost/calendar', {

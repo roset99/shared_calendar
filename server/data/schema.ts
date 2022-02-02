@@ -1,7 +1,8 @@
-import { makeExecutableSchema } from 'graphql-tools';
-import { resolvers } from './resolvers';
+import { gql } from 'apollo-server';
 
-const typeDefs = `
+// || ========== Schema/TypeDefs ========== ||
+
+export const typeDefs = gql`
     type Person {
         id: ID
         name: String
@@ -98,7 +99,3 @@ const typeDefs = `
         deleteEvent(id: ID!): String
     }
 `;
-
-const schema = makeExecutableSchema({ typeDefs, resolvers });
-
-export { schema };
