@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import './CreatePersonComponent.css';
 import { Link, useNavigate } from 'react-router-dom';
+import { json } from 'stream/consumers';
 
 
 const CREATE_PERSON = gql`
@@ -9,9 +10,6 @@ const CREATE_PERSON = gql`
         createPerson(input: $input){
             name
             birthday 
-            events {
-               id
-            }
             colour
             family {
                 id
@@ -41,27 +39,30 @@ function availableColours() {
 }
 
 
-const CreatePerson: any = ({ }) => {
+const CreatePerson: any = ({ currentFamily}: any) => {
     const { data: getFamilyData, loading, error } = useQuery(GET_FAMILY);
 
     const redirect = useNavigate();
 
     const [name, setName] = useState<string>("");
     const [birthday, setBirthday] = useState<string>("");
-    const [event, setEvent] = useState<[]>([]);
+   // const [events, setEvents] = useState<[]>([]);
     const [colour, setColour] = useState<string>("");
-    const [family, setFamily] = useState<string>("");
+   // const [family, setFamily] = useState<{}>(currentFamily);
     const [createPerson, { data: createPersonData, loading: personLoading, error: personError }] = useMutation(CREATE_PERSON);
 
 
     const colours: string[] = ["ffadad", "ffd6a5", "fdffb6", "caffbf", "a0c4ff", "bdb2ff", "ffc6ff"];
 
-    useEffect(() => {
-        const storageItem = sessionStorage.getItem("currentFamily");
-        if (storageItem !== null){
-        setFamily(storageItem);
-        }
-    }, []);
+    // useEffect(() => {
+    //     const storageItem = sessionStorage.getItem("currentFamily");
+    //     if (storageItem !== null){
+    //     const familyItem = JSON.parse(storageItem);
+    //     setFamily(familyItem);
+    //     }
+    //     console.log("this is the", family)
+    // }, [currentFamily]);
+
 
     if (personLoading) return 'Submitting...';
     if (personError) return `Submission error! ${personError.message}`;
@@ -71,15 +72,14 @@ const CreatePerson: any = ({ }) => {
 
     const addPerson = (e: React.FormEvent) => {
         e.preventDefault();
-
+    
         createPerson({
             variables: {
                 input: {
                     name: name,
                     birthday: birthday,
-                    event: event,
                     colour: colour,
-                    family: family
+                    family: currentFamily
                 }
             }
         })

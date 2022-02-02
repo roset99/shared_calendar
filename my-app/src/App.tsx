@@ -42,7 +42,7 @@ function App() {
           <Route path="/login" element={<Login onLoginSetFamily={onLoginSetFamily}/>} /> 
           <Route path="/events" element={<Events/>} /> 
           <Route path="/days" element={<DailyCalendar/>} /> 
-          <Route path="/members" element={<CreatePerson />} />
+          <Route path="/members" element={<CreatePerson currentFamily={currentFamily} />} />
       </Routes>
     </BrowserRouter>
   );
