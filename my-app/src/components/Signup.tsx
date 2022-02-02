@@ -3,6 +3,7 @@ import e from 'express';
 import React, { useState } from 'react';
 import { gql, useMutation, useLazyQuery } from '@apollo/client';        
 import bcrypt from 'bcryptjs';
+import { useNavigate } from "react-router-dom"
 
 const CREATE_FAMILY = gql`
     mutation CreateFamily($input: FamilyInput) {
@@ -25,6 +26,8 @@ function validatePassword (pwd: string) {
 }
 
 function SignUp({onLoginSetFamily}:any): any {
+
+    const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -88,6 +91,7 @@ function SignUp({onLoginSetFamily}:any): any {
         });
         
         onLoginSetFamily({id: data.createFamily.id});
+        navigate("/members");
     }
 
     //Generate salt to always be added to password
