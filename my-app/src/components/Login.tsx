@@ -2,11 +2,15 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react';
 import bcrypt from "bcryptjs"
+import e from 'express';
 
+interface Props {
+    onLoginSetFamily: any,
+}
 
 const salt = bcrypt.genSaltSync(10);
 
-function Login(onLoginSetFamily: any):JSX.Element {
+function Login({onLoginSetFamily}: Props) {
     const navigate = useNavigate()
 
     const [email, setEmail] = useState("");
@@ -15,8 +19,6 @@ function Login(onLoginSetFamily: any):JSX.Element {
 
     const handleForm = (e: React.FormEvent) => {
         e.preventDefault();
-        
-
         navigate("/month-calendar");
     }
 
@@ -27,6 +29,11 @@ function Login(onLoginSetFamily: any):JSX.Element {
     const handlePassword = (e: any) => {
         setPassword(e.target.value);
         setHashed(bcrypt.hashSync(e.target.value, salt));
+    }
+
+    const handleLogout = () => {
+        sessionStorage.removeItem("currentFamily")
+        navigate("/")
     }
 
     return(
@@ -43,10 +50,10 @@ function Login(onLoginSetFamily: any):JSX.Element {
                     <input type="checkbox" />
                     </div>
                     <button type="submit" className="loginbtn">Login</button>
-
                     <p>Need an account?</p>
                     <Link to="/signup" className="signup-link">Sign up here</Link>
                 </form>
+                    <button onClick={handleLogout}>Logout</button>
         </>
     );
 }

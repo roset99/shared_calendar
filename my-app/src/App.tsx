@@ -32,7 +32,6 @@ function App() {
     setCurrentFamily(family);
   }
 
-  
   return (
     <BrowserRouter>
       <Routes>
