@@ -35,7 +35,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-          <Route path="/" element={<Homepage/>} />
+          <Route path="/" element={<Homepage currentFamily={currentFamily}/>} />
           <Route path="/month-calendar" element={<MonthlyCalendar currentFamily={currentFamily}/>} />
           <Route path="/signup" element={<SignUp onLoginSetFamily={onLoginSetFamily}/>} />  
           <Route path="/login" element={<Login onLoginSetFamily={onLoginSetFamily}/>} /> 

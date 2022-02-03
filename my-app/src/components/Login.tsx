@@ -48,11 +48,6 @@ function Login({onLoginSetFamily}: Props): any {
         setPassword(e.target.value);
     }
 
-    const handleLogout = () => {
-        sessionStorage.clear();
-        navigate("/")
-    }
-
     return(
         <>
                 <form className="login" onSubmit={handleForm}>
@@ -70,7 +65,6 @@ function Login({onLoginSetFamily}: Props): any {
                     <p>Need an account?</p>
                     <Link to="/signup" className="signup-link">Sign up here</Link>
                 </form>
-                    <button onClick={handleLogout}>Logout</button>
         </>
     );
 }
