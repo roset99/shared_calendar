@@ -1,17 +1,10 @@
-
-import e from 'express';
 import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';        
-// import bcrypt from 'bcryptjs';
 import { useNavigate } from "react-router-dom"
 
-const CREATE_FAMILY = gql`
-    mutation CreateFamily($input: FamilyInput) {
-        createFamily(input: $input){
-            id
-            email
-            password
-        }
+const REGISTER = gql`
+    mutation Register($input: FamilyInput) {
+        register(input: $input)
     }
 `;
 
@@ -32,7 +25,6 @@ function SignUp({onLoginSetFamily}:any): any {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [repassword, setRepassword] = useState("");
-    // const [hashed, setHashed] = useState("");
 
     const [emailError, setEmailError] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
@@ -41,7 +33,7 @@ function SignUp({onLoginSetFamily}:any): any {
     const [errorPwdMsg, setErrorPwdMsg] = useState("");
     const [repwdError, setRepwdError] = useState(false)
 
-    const [createFamily, {data, loading, error}] = useMutation(CREATE_FAMILY);
+    const [register, {data, loading, error}] = useMutation(REGISTER);
 
 
     if (loading) return 'Submitting...';
@@ -49,7 +41,7 @@ function SignUp({onLoginSetFamily}:any): any {
     
     let invalid = false;
 
-    const doStuff = async (e: React.FormEvent) => {
+    const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
 
         console.log(email, validateEmail(email));
@@ -81,7 +73,7 @@ function SignUp({onLoginSetFamily}:any): any {
             return
         }
 
-        await createFamily({ 
+        await register({ 
             variables: {
                 input: { 
                     email: email,
@@ -90,11 +82,10 @@ function SignUp({onLoginSetFamily}:any): any {
             } 
         })
             .then((result) => {
-                // console.log(result)
-                onLoginSetFamily(result.data.login)
+                console.log(result.data);
+                onLoginSetFamily(result.data.register)
             });
         
-        // await onLoginSetFamily({id: data.createFamily.id});
         navigate("/members");
     }
 
@@ -107,7 +98,6 @@ function SignUp({onLoginSetFamily}:any): any {
 
     const handlePassword = async (e: any) => {
         setPassword(e.target.value);
-        // setHashed(await bcrypt.hash(e.target.value, 12));
     }
 
     const handleRepassword = (e: any) => {
@@ -118,7 +108,7 @@ function SignUp({onLoginSetFamily}:any): any {
 
     return (  
         <>
-            <form onSubmit={doStuff} className="signup">
+            <form onSubmit={handleSignup} className="signup">
                 <h1>Sign up</h1>
 
                 <label htmlFor="email">Email</label>
@@ -140,32 +130,3 @@ function SignUp({onLoginSetFamily}:any): any {
 }
  
 export default SignUp;
-
-
-// const query = 
-        // `mutation CreateFamily($input: FamilyInput) {
-        //     createFamily(input: $input){
-        //         id
-        //         email
-        //         password
-        //     }
-        // }`;
-
-        // fetch('http://localhost:8080/graphql', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //         'Accept': 'application/json'
-        //     },
-        //     body: JSON.stringify({
-        //         query,
-        //         variables: {
-        //             input: {
-        //                 email,
-        //                 password
-        //             }
-        //         }
-        //     })
-        // })
-        //     .then(r => r.json())
-        //     .then(data =>  console.log(data));
