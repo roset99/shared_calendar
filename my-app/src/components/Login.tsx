@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react';
-import bcrypt from "bcryptjs"
-import e from 'express';
+// import bcrypt from "bcryptjs"
 import { gql, useMutation } from '@apollo/client';        
 
 interface Props {
@@ -18,7 +17,7 @@ const LOGIN = gql`
 function Login({onLoginSetFamily}: Props): any {
 
     const navigate = useNavigate();
-    const [login, {loading, error}] = useMutation(LOGIN);
+    const [login, {data, loading, error}] = useMutation(LOGIN);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [hashed, setHashed] = useState("");
@@ -26,17 +25,19 @@ function Login({onLoginSetFamily}: Props): any {
     if (loading) return 'Submitting...';
     if (error) return `Submission error! ${error.message}`;
 
-    const handleForm = (e: React.FormEvent) => {
+    const handleForm = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        login({
+        await login({
             variables: {
                     email: email,
-                    password: hashed
+                    password: password
             }
-        })
+        }).then(
+            (result) => 
+            onLoginSetFamily(result.data.login));
 
-        // navigate("/month-calendar");
+        navigate("/month-calendar");
     }
 
     const handleEmail = (e: any) => {
@@ -45,12 +46,12 @@ function Login({onLoginSetFamily}: Props): any {
     
     const handlePassword = async (e: any) => {
         setPassword(e.target.value);
-        setHashed(await bcrypt.hash(e.target.value, 12));
+        // setHashed(await bcrypt.hash(e.target.value, 12));
     }
 
     const handleLogout = () => {
-        sessionStorage.removeItem("currentFamily")
-        // sessionStorage.setItem();
+        sessionStorage.clear()
+        // sessionStorage.removeItem("currentFamily")
         navigate("/")
     }
 

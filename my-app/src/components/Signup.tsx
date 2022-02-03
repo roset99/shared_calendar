@@ -2,7 +2,7 @@
 import e from 'express';
 import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';        
-import bcrypt from 'bcryptjs';
+// import bcrypt from 'bcryptjs';
 import { useNavigate } from "react-router-dom"
 
 const CREATE_FAMILY = gql`
@@ -32,7 +32,7 @@ function SignUp({onLoginSetFamily}:any): any {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [repassword, setRepassword] = useState("");
-    const [hashed, setHashed] = useState("");
+    // const [hashed, setHashed] = useState("");
 
     const [emailError, setEmailError] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
@@ -85,13 +85,13 @@ function SignUp({onLoginSetFamily}:any): any {
             variables: {
                 input: { 
                     email: email,
-                    password: hashed
+                    password: password
                 }
             } 
         })
             .then((result) => {
                 // console.log(result)
-                onLoginSetFamily({ id: result.data.createFamily.id })
+                onLoginSetFamily(result.data.login)
             });
         
         // await onLoginSetFamily({id: data.createFamily.id});
@@ -107,7 +107,7 @@ function SignUp({onLoginSetFamily}:any): any {
 
     const handlePassword = async (e: any) => {
         setPassword(e.target.value);
-        setHashed(await bcrypt.hash(e.target.value, 12));
+        // setHashed(await bcrypt.hash(e.target.value, 12));
     }
 
     const handleRepassword = (e: any) => {
