@@ -34,6 +34,33 @@ query GetEventsByFamily($family: FamilyInput){
     
     }
 }`;
+const GET_FAMILY = gql`
+query GetFamilyById($id: ID){
+    getFamilyById(id: $id){
+        name
+        email
+        members{
+            id
+            name
+            birthday
+            colour
+        }
+        events{
+            id
+            attendees {
+                name
+                colour
+            }
+            date 
+            startTime
+            endTime
+            title 
+        }
+    }
+        
+
+    }
+`
 
 const MonthlyCalendar = ({currentFamily}: any): any => {
     
@@ -42,42 +69,48 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
     const [events, setEvents] = useState<any>([]);
     const [eventFormShow, setEventFormShow] = useState<boolean>(false);
-    const { loading, error, data, refetch } = useQuery(GET_EVENTS, {variables: {FamilyInput: {id: currentFamily.id}}});
     const [family, setFamily] = useState<any>(null);
     const [familyMembers, setFamilyMembers] = useState<any[]>([]);
+    const [filteredMembers, setFilteredMembers] = useState<any[]>(familyMembers);
+    
     const [dateClicked, setDateClicked] = useState<string>("");
+    const { loading, error, data, refetch } = useQuery(GET_FAMILY, {variables: {id: currentFamily.id}});
     
-    // function getSessionStorageOrDefault(key: string, defaultValue: null) {
-    //     const stored = sessionStorage.getItem(key);
     
-    //     if (!stored) {
-    //       return defaultValue;
-    //     }
     
-    //     return JSON.parse(stored);
-    //   }
+    const findFamilyMembers = () => {
+        if (data !== null) {
+            setFamilyMembers(data.getFamilyById.members);
+        }
 
-    // const accessFamily = () => {
-    //     const familyFromStore = getSessionStorageOrDefault("family", null);
-    //     setFamily(familyFromStore);
-    // }
-    
-    // const findFamilyMembers = () => {
-    //     if (family !== null) {
-    //         setFamilyMembers(family.members);
-    //     }
         
-    // }
+    }
 
-    // useEffect(() => {
-    //     accessFamily();
-    //     findFamilyMembers();
-    // }, []);
+    const filterMember = (member: any): void => {
+        const index = filteredMembers.indexOf(member);
+        const inbetween = filteredMembers.splice(index, 1);
+        setFilteredMembers(inbetween);
+    }
+
+    const addFilteredMember = (member: any): void => {
+        if (!filteredMembers.includes(member)){
+           const inbetween = [member,...filteredMembers]
+           setFilteredMembers(inbetween);
+        }
+
+        
+    }
+
+    useEffect(() => {
+        if (!loading && !error){
+            findFamilyMembers();
+        }
+    }, [data]);
 
     const getEvents = (): void => {
         if (!loading && !error ){
-            setEvents(data.getEventsByFamily);
-            console.log("this is data ", data.getEventsByFamily);
+            setEvents(data.getFamilyById.events);
+            console.log("this is data ", data.getFamilyById.events);
             
         }  
     }
@@ -89,8 +122,8 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
     const refreshEvents = (): void => {
         refetch();
         if (!loading && !error ){
-            setEvents(data.getEventsByFamily);
-            console.log("this is data ", data.getEventsByFamily);
+            setEvents(data.getFamilyById.events);
+            console.log("this is data ", data.getFamilyById.events);
             
         } 
     }
@@ -220,7 +253,7 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
                 {monthDayComponents}
             </div>
             <div className={eventFormShow ? "event-form form-show" : "event-form form-hidden"}>
-                <AddEvent onClose={onClickShowForm} day={""} refreshEvents={refreshEvents}/>
+                <AddEvent onClose={onClickShowForm} day={""} refreshEvents={refreshEvents} currentFamily={currentFamily} familyMembers={familyMembers}/>
             </div>
             <div className="float" onClick={() => onClickShowForm()}>
                 <i className="fa fa-plus my-float"></i>

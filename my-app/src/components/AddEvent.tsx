@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 
 import { EventInputInterface } from './Interfaces';
+import { AnyARecord } from 'dns';
 
 // || ==================== GraphQL Queries/Mutations ==================== ||
 
@@ -21,8 +22,9 @@ interface Props {
     onClose: () => void;
 
     // passed down to be inserted into addEvent request
-    family: any;
     members: any;
+    currentFamily: any;
+    familyMembers: any
 
     // whether is being displayed from month or day page
     day: string;
@@ -32,14 +34,14 @@ interface Props {
 // || ==================== Component ==================== ||
 
 // const AddEvent: any = ({ show, onClose, family, members, day, refreshEvents }: Props) => {
-const AddEvent: any = ({ onClose, day, refreshEvents }: Props) => {
+const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembers }: Props) => {
     
     const [title, setTitle] = useState<string>("");
     const [date, setDate] = useState<string>("");
     if (day) { setDate(day) };
     const [startTime, setStartTime] = useState<string>("");
     const [endTime, setEndTime] = useState<string>("");
-    const [attendees, setAttendees] = useState<[]>([]);
+    const [attendees, setAttendees] = useState<any>([]);
 
     const [createEvent, { data: createEventData, loading: createEventLoading, error: createEventError }] = useMutation(CREATE_EVENT);
 
@@ -52,11 +54,17 @@ const AddEvent: any = ({ onClose, day, refreshEvents }: Props) => {
 
     const handleSubmit = (e: React.FormEvent): void => {
         e.preventDefault();
+        const attendeesMod = [];
+        for (let attendee of attendees){
+            attendeesMod.push({id: attendee});
+        }
+        console.log("This is attendeesMod ", attendeesMod);
 
         const newEvent: EventInputInterface = {
             title: title,
-            family: { id: "61f2dae90357581390862808" },
-            attendees: [],
+            family: currentFamily,
+            attendees: attendeesMod,
+
             date: date,
             startTime: startTime,
             endTime: endTime
@@ -77,6 +85,30 @@ const AddEvent: any = ({ onClose, day, refreshEvents }: Props) => {
             .then(result => console.log(result))
             .then(() => refreshEvents())
     }
+   
+    const memberDropdown = familyMembers.map((member: any) => {
+        return(
+            <>
+                <input type="checkbox" id={member.name} name={member.name} value={member.id} onClick={(e) => handleOnChange(e)}></input>
+                <label htmlFor={member.name}>{member.name}</label>
+            </>
+            
+        )
+        
+       
+    });
+    const handleOnChange = (e:any) => {
+        if (attendees.includes(e.target.value)){
+            let filtered = attendees.filter((value:string) => {
+                return value !==e.target.value;
+            })
+            setAttendees(filtered);
+            console.log(filtered);
+        } else {
+            setAttendees([e.target.value,...attendees]);
+        }
+    } 
+
 
     // || ========== Render return ========== ||
 
@@ -103,6 +135,13 @@ const AddEvent: any = ({ onClose, day, refreshEvents }: Props) => {
 
             <label htmlFor='endTime'>End Time</label>
             <input type="text" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+
+            <label htmlFor="attendees">Choose attendees</label>
+            <div className="attendees">
+                {memberDropdown}
+            </div>
+            
+
 
             <button type="submit">Submit</button>
         </form>
