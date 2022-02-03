@@ -10,7 +10,8 @@ const SECRET = "createaverystrongsec34!retthatalsoincludes2423412wdsa324e34e";
 
 export const resolvers = { 
     Query: {
-        getAllFamilies: async () => {
+        getAllFamilies: async (root: any, args: any, { user }: any) => {
+            if (!user) { throw new Error("You are not logged in") }
             return Families.find({})
                 .populate({ path: 'members', populate: { path: 'events' }})
                 .populate({ path: 'events', populate: { path: 'attendees' }});
@@ -53,18 +54,21 @@ export const resolvers = {
     },
     Mutation: {
         login: async (root: any, { email, password }: ILogin) => {
+            // see if family exists with email
             const user = await Families.findOne({ email: email });
-            if (!user) { throw new Error("Family not found") };
+            if (!user) { throw new Error(`No family with email: ${email}`) };
 
+            // check if password is correct
             const isValid = await bcrypt.compare(password, user.password);
             if (!isValid) { throw new Error("Incorrect password") };
 
+            // create and return token
             const token = jwt.sign(
                 { 
                     user: { id: user.id }
                 },
                 SECRET,
-                { expiresIn: "1d" }
+                { expiresIn: "1h" } // is valid for 1 day currently
             );
 
             return token;
