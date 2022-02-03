@@ -57,7 +57,7 @@ const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembe
         const newEvent: EventInputInterface = {
             title: title,
             family: currentFamily,
-            attendees: [],
+            attendees: attendees,
             date: date,
             startTime: startTime,
             endTime: endTime
@@ -78,11 +78,13 @@ const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembe
             .then(result => console.log(result))
             .then(() => refreshEvents())
     }
-    // const memberDropdown = familyMembers.map(member => {
+    const memberDropdown = familyMembers.map((member: any) => {
+        return(
+            <option value={member.id}>{member.name}</option>
+        )
         
-    //         <option value={member.id}>{member.name}</option>
        
-    // })
+    })
 
     // || ========== Render return ========== ||
 
@@ -109,10 +111,10 @@ const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembe
 
             <label htmlFor='endTime'>End Time</label>
             <input type="text" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
-            {/* <select name="attendees" id="attendees">
-                <option value=""></option>
+            <label htmlFor="attendees">Choose Attendees:</label>
+            <select name="attendees" id="attendees" multiple>
                 {memberDropdown}
-            </select> */}
+            </select>
 
             <button type="submit">Submit</button>
         </form>
