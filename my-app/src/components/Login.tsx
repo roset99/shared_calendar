@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react';
 import bcrypt from "bcryptjs"
 import e from 'express';
+import { gql, useMutation } from '@apollo/client';        
 
 interface Props {
     onLoginSetFamily: any,
@@ -10,16 +11,36 @@ interface Props {
 
 const salt = bcrypt.genSaltSync(10);
 
-function Login({onLoginSetFamily}: Props) {
-    const navigate = useNavigate()
+const LOGIN = gql`
+    mutation Login($email: String, $password: String) {
+        login(email: $email, password: $password) {
+            token
+        }
+    }
+`;
 
+function Login({onLoginSetFamily}: Props): any {
+
+    const navigate = useNavigate();
+    const [login, {loading, error}] = useMutation(LOGIN);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [hashed, setHashed] = useState("");
 
+    if (loading) return 'Submitting...';
+    if (error) return `Submission error! ${error.message}`;
+
     const handleForm = (e: React.FormEvent) => {
         e.preventDefault();
-        navigate("/month-calendar");
+
+        login({
+            variables: {
+                    email: email,
+                    password: hashed
+            }
+        })
+
+        // navigate("/month-calendar");
     }
 
     const handleEmail = (e: any) => {

@@ -1,7 +1,7 @@
 
 import e from 'express';
 import React, { useState } from 'react';
-import { gql, useMutation, useLazyQuery } from '@apollo/client';        
+import { gql, useMutation } from '@apollo/client';        
 import bcrypt from 'bcryptjs';
 import { useNavigate } from "react-router-dom"
 
