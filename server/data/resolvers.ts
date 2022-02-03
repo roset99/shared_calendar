@@ -59,15 +59,17 @@ export const resolvers = {
             const isValid = await bcrypt.compare(password, user.password);
             if (!isValid) { throw new Error("Incorrect password") };
 
-            const token = jwt.sign(
-                { 
-                    user: { id: user.id }
-                },
-                SECRET,
-                { expiresIn: "1d" }
-            );
+            // const token = jwt.sign(
+            //     { 
+            //         user: { id: user.id }
+            //     },
+            //     SECRET,
+            //     { expiresIn: "1d" }
+            // );
 
-            return token;
+            // return token;
+
+            return user.id;
         },
 
         createFamily: async (root: any, { input }: any) => {
