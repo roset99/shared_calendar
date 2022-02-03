@@ -37,7 +37,6 @@ query GetEventsByFamily($family: FamilyInput){
 const GET_FAMILY = gql`
 query GetFamilyById($id: ID){
     getFamilyById(id: $id){
-        id
         name
         email
         members{
@@ -70,20 +69,14 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
     const [events, setEvents] = useState<any>([]);
     const [eventFormShow, setEventFormShow] = useState<boolean>(false);
-    const { loading, error, data, refetch } = useQuery(GET_FAMILY, {variables: {id: currentFamily.id}});
     const [family, setFamily] = useState<any>(null);
     const [familyMembers, setFamilyMembers] = useState<any[]>([]);
+    const [filteredMembers, setFilteredMembers] = useState<any[]>(familyMembers);
+    
     const [dateClicked, setDateClicked] = useState<string>("");
+    const { loading, error, data, refetch } = useQuery(GET_FAMILY, {variables: {id: currentFamily.id}});
     
-    // function getSessionStorageOrDefault(key: string, defaultValue: null) {
-    //     const stored = sessionStorage.getItem(key);
     
-    //     if (!stored) {
-    //       return defaultValue;
-    //     }
-    
-    //     return JSON.parse(stored);
-    //   }
     
     const findFamilyMembers = () => {
         if (data !== null) {
@@ -92,11 +85,25 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
         
     }
 
+    const filterMember = (member: any): void => {
+        const index = filteredMembers.indexOf(member);
+        const inbetween = filteredMembers.splice(index, 1);
+        setFilteredMembers(inbetween);
+    }
+
+    const addFilteredMember = (member: any): void => {
+        if (!filteredMembers.includes(member)){
+           const inbetween = [member,...filteredMembers]
+           setFilteredMembers(inbetween);
+        }
+        
+    }
+
     useEffect(() => {
         if (!loading && !error){
             findFamilyMembers();
         }
-    }, []);
+    }, [data]);
 
     const getEvents = (): void => {
         if (!loading && !error ){
