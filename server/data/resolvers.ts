@@ -1,10 +1,10 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+// import jwt from 'jsonwebtoken';
 
 import { Families, People, Events } from './dbConnectors';
 
 // SECRET
-const SECRET = "createaverystrongsec34!retthatalsoincludes2423412wdsa324e34e";
+// const SECRET = "createaverystrongsec34!retthatalsoincludes2423412wdsa324e34e";
 
 // || ========== Resolver Map ========== ||
 

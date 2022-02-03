@@ -7,35 +7,37 @@ interface Props {
     onLoginSetFamily: any,
 }
 
-// const LOGIN = gql`
-//     mutation Login($email: String, $password: String) {
-//         login(email: $email, password: $password) {
-//             token
-//         }
-//     }
-// `;
+const LOGIN = gql`
+    mutation Login($email: String, $password: String) {
+        login(email: $email, password: $password)
+    }
+`;
 
 function Login({onLoginSetFamily}: Props): any {
 
     const navigate = useNavigate();
-    // const [login, {loading, error}] = useMutation(LOGIN);
+    const [login, {loading, error}] = useMutation(LOGIN);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    // if (loading) return 'Submitting...';
-    // if (error) return `Submission error! ${error.message}`;
+    if (loading) return 'Submitting...';
+    if (error) return `Submission error! ${error.message}`;
 
-    const handleForm = (e: React.FormEvent) => {
+    const handleForm = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // login({
-        //     variables: {
-        //             email: email,
-        //             password: hashed
-        //     }
-        // })
-
-        // navigate("/month-calendar");
+        await login({
+            variables: {
+                    email: email,
+                    password: password
+            }
+        })
+        .then(
+            (results) => {
+                onLoginSetFamily({id: results.data.login})
+            }
+        )
+        navigate("/month-calendar");
     }
 
     const handleEmail = (e: any) => {
@@ -47,8 +49,7 @@ function Login({onLoginSetFamily}: Props): any {
     }
 
     const handleLogout = () => {
-        sessionStorage.removeItem("currentFamily")
-        // sessionStorage.setItem();
+        sessionStorage.clear();
         navigate("/")
     }
 
