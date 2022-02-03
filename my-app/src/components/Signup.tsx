@@ -98,17 +98,16 @@ function SignUp({onLoginSetFamily}:any): any {
         navigate("/members");
     }
 
-    //Generate salt to always be added to password
-    const salt = bcrypt.genSaltSync(10);
+
 
 
     const handleEmail = (e: any) => {
         setEmail(e.target.value);
     }
 
-    const handlePassword = (e: any) => {
+    const handlePassword = async (e: any) => {
         setPassword(e.target.value);
-        setHashed(bcrypt.hashSync(e.target.value, salt));
+        setHashed(await bcrypt.hash(e.target.value, 12));
     }
 
     const handleRepassword = (e: any) => {

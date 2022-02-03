@@ -9,13 +9,9 @@ interface Props {
     onLoginSetFamily: any,
 }
 
-const salt = bcrypt.genSaltSync(10);
-
 const LOGIN = gql`
     mutation Login($email: String, $password: String) {
-        login(email: $email, password: $password) {
-            token
-        }
+        login(email: $email, password: $password) 
     }
 `;
 
@@ -47,9 +43,9 @@ function Login({onLoginSetFamily}: Props): any {
         setEmail(e.target.value);
     }
     
-    const handlePassword = (e: any) => {
+    const handlePassword = async (e: any) => {
         setPassword(e.target.value);
-        setHashed(bcrypt.hashSync(e.target.value, salt));
+        setHashed(await bcrypt.hash(e.target.value, 12));
     }
 
     const handleLogout = () => {
