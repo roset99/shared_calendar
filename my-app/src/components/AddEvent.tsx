@@ -64,6 +64,7 @@ const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembe
             title: title,
             family: currentFamily,
             attendees: attendeesMod,
+
             date: date,
             startTime: startTime,
             endTime: endTime
@@ -108,6 +109,7 @@ const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembe
         }
     } 
 
+
     // || ========== Render return ========== ||
 
     return (
@@ -133,11 +135,13 @@ const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembe
 
             <label htmlFor='endTime'>End Time</label>
             <input type="text" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+
             <label htmlFor="attendees">Choose attendees</label>
             <div className="attendees">
                 {memberDropdown}
             </div>
             
+
 
             <button type="submit">Submit</button>
         </form>

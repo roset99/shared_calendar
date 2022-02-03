@@ -82,6 +82,7 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
         if (data !== null) {
             setFamilyMembers(data.getFamilyById.members);
         }
+
         
     }
 
@@ -96,6 +97,7 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
            const inbetween = [member,...filteredMembers]
            setFilteredMembers(inbetween);
         }
+
         
     }
 
