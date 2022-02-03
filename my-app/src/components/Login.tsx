@@ -33,6 +33,7 @@ function Login({onLoginSetFamily}: Props) {
 
     const handleLogout = () => {
         sessionStorage.removeItem("currentFamily")
+        // sessionStorage.setItem();
         navigate("/")
     }
 
