@@ -1,6 +1,10 @@
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 import { Families, People, Events } from './dbConnectors';
+
+// SECRET
+const SECRET = "createaverystrongsec34!retthatalsoincludes2423412wdsa324e34e";
 
 // || ========== Resolver Map ========== ||
 
@@ -48,6 +52,67 @@ export const resolvers = {
         },
     },
     Mutation: {
+        login: async (root: any, { email, password }: ILogin) => {
+            const user = await Families.findOne({ email: email });
+            if (!user) { throw new Error("Family not found") };
+
+            const isValid = await bcrypt.compare(password, user.password);
+            if (!isValid) { throw new Error("Incorrect password") };
+
+            const token = jwt.sign(
+                { 
+                    user: { id: user.id }
+                },
+                SECRET,
+                { expiresIn: "1d" }
+            );
+
+            return token;
+        },
+
+        createFamily: async (root: any, { input }: any) => {
+            // create family db object
+            const newFamily = new Families({
+                name: input.name,
+                email: input.email,
+                password: await bcrypt.hash(input.password, 12), // hash password
+                members: input.members,
+                events: input.events
+            });
+
+            newFamily.id = newFamily._id;
+
+            // save to db and return family
+            newFamily.save();
+            return newFamily // no populate as family will not contain members/events at this point
+        },
+        updateFamily: async (root: any, { input }: any) => {
+            // cannot update members and events with this
+            return Families.findOneAndUpdate({ _id: input.id }, input, { new: true }) 
+        },
+        deleteFamily: async (root: any, { id }: any) => {
+            // get family from db with id
+            const family = await Families.findById(id);
+            if (!family) {
+                throw new Error
+            }
+
+            // delete people in family.members
+            for (let i = 0; i < family.members.length; i++){
+                const personId = family.members[i]
+                await People.deleteOne({ _id: personId })
+            }
+        
+            // delete events in family.events
+            for (let i = 0; i < family.events.length; i++){
+                const eventId = family.events[i]
+                await Events.deleteOne({ _id: eventId })
+            }
+            
+            // delete family from db
+            await Families.deleteOne({ _id: id });
+            return ('Succesfully deleted family');
+        },
         createPerson: async (root: any, { input }: any) => {
             // create new person db object and save in database
             const newPerson = new People({
@@ -192,48 +257,12 @@ export const resolvers = {
             
             return ('Successfully deleted event');
         },
-        createFamily: async (root: any, { input }: any) => {
-            // create family db object
-            const newFamily = new Families({
-                name: input.name,
-                email: input.email,
-                password: await bcrypt.hash(input.password, 12), // hash password
-                members: input.members,
-                events: input.events
-            });
-
-            newFamily.id = newFamily._id;
-
-            // save to db and return family
-            newFamily.save();
-            return newFamily // no populate as family will not contain members/events at this point
-        },
-        updateFamily: async (root: any, { input }: any) => {
-            // cannot update members and events with this
-            return Families.findOneAndUpdate({ _id: input.id }, input, { new: true }) 
-        },
-        deleteFamily: async (root: any, { id }: any) => {
-            // get family from db with id
-            const family = await Families.findById(id);
-            if (!family) {
-                throw new Error
-            }
-
-            // delete people in family.members
-            for (let i = 0; i < family.members.length; i++){
-                const personId = family.members[i]
-                await People.deleteOne({ _id: personId })
-            }
-        
-            // delete events in family.events
-            for (let i = 0; i < family.events.length; i++){
-                const eventId = family.events[i]
-                await Events.deleteOne({ _id: eventId })
-            }
-            
-            // delete family from db
-            await Families.deleteOne({ _id: id });
-            return ('Succesfully deleted family');
-        }
     },
 };
+
+// || ========== Interfaces ========== ||
+
+interface ILogin { // for login mutation input
+    email: string,
+    password: string
+}

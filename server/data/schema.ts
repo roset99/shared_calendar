@@ -88,6 +88,7 @@ export const typeDefs = gql`
     }
 
     type Mutation {
+        login(email: String, password: String): String
         createFamily(input: FamilyInput): Family
         updateFamily(input: FamilyInput): Family
         deleteFamily(id: ID!): String
