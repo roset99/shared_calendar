@@ -1,44 +1,39 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react';
-import bcrypt from "bcryptjs"
-import e from 'express';
 import { gql, useMutation } from '@apollo/client';        
 
 interface Props {
     onLoginSetFamily: any,
 }
 
-const salt = bcrypt.genSaltSync(10);
-
-const LOGIN = gql`
-    mutation Login($email: String, $password: String) {
-        login(email: $email, password: $password) {
-            token
-        }
-    }
-`;
+// const LOGIN = gql`
+//     mutation Login($email: String, $password: String) {
+//         login(email: $email, password: $password) {
+//             token
+//         }
+//     }
+// `;
 
 function Login({onLoginSetFamily}: Props): any {
 
     const navigate = useNavigate();
-    const [login, {loading, error}] = useMutation(LOGIN);
+    // const [login, {loading, error}] = useMutation(LOGIN);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [hashed, setHashed] = useState("");
 
-    if (loading) return 'Submitting...';
-    if (error) return `Submission error! ${error.message}`;
+    // if (loading) return 'Submitting...';
+    // if (error) return `Submission error! ${error.message}`;
 
     const handleForm = (e: React.FormEvent) => {
         e.preventDefault();
 
-        login({
-            variables: {
-                    email: email,
-                    password: hashed
-            }
-        })
+        // login({
+        //     variables: {
+        //             email: email,
+        //             password: hashed
+        //     }
+        // })
 
         // navigate("/month-calendar");
     }
@@ -49,7 +44,6 @@ function Login({onLoginSetFamily}: Props): any {
     
     const handlePassword = (e: any) => {
         setPassword(e.target.value);
-        setHashed(bcrypt.hashSync(e.target.value, salt));
     }
 
     const handleLogout = () => {
