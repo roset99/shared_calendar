@@ -68,13 +68,12 @@ export const resolvers = {
                     user: { id: user.id }
                 },
                 SECRET,
-                { expiresIn: "1h" } // is valid for 1 day currently
+                { expiresIn: "1h" } // is valid for 1 hour currently
             );
 
             return token;
         },
-
-        createFamily: async (root: any, { input }: any) => {
+        register: async (root: any, { input }: any) => {
             // create family db object
             const newFamily = new Families({
                 name: input.name,
@@ -88,7 +87,17 @@ export const resolvers = {
 
             // save to db and return family
             newFamily.save();
-            return newFamily // no populate as family will not contain members/events at this point
+            
+            // create and return token
+            const token = jwt.sign(
+                { 
+                    user: { id: newFamily.id }
+                },
+                SECRET,
+                { expiresIn: "1h" } // is valid for 1 hour currently
+            );
+
+            return token;
         },
         updateFamily: async (root: any, { input }: any) => {
             // cannot update members and events with this
