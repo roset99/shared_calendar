@@ -61,13 +61,15 @@ const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembe
             attendeesMod.push({id: attendee});
         }
         console.log("This is attendeesMod ", attendeesMod);
+        const dateArray = date.split("-");
+        const dateFormat = dateArray[2] +"/" +dateArray[1] + "/" + dateArray[0];
 
         const newEvent: EventInputInterface = {
             title: title,
             family: currentFamily,
             attendees: attendeesMod,
 
-            date: date,
+            date: dateFormat,
             startTime: startTime,
             endTime: endTime
         }
@@ -137,15 +139,15 @@ const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembe
             :
             <>
                 <label htmlFor='date'>Date</label>
-                <input type="text" value={date} onChange={(e) => setDate(e.target.value)} />
+                <input type="date" value={date} onChange={(e) => {setDate(e.target.value)}} />
             </>
             }
 
             <label htmlFor='startTime'>Start Time</label>
-            <input type="text" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+            <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
 
             <label htmlFor='endTime'>End Time</label>
-            <input type="text" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+            <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
 
             <label htmlFor="attendees">Choose attendees</label>
             <div className="attendees">

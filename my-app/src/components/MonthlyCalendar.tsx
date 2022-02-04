@@ -68,6 +68,7 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
     const [year, setYear] = useState<number>(0);
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
     const [events, setEvents] = useState<any>([]);
+   
     const [eventFormShow, setEventFormShow] = useState<boolean>(false);
     const [family, setFamily] = useState<any>(null);
     const [familyMembers, setFamilyMembers] = useState<any[]>([]);
@@ -188,10 +189,11 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
     
 
     const monthDayComponents = daysInMonth.map((index) => {
+        
         let monthFormat = "";
         let dayFormat = "";
         if (month < 10 ){
-           const month1 = month + 1; 
+           let month1 = month + 1; 
            monthFormat = "0" + month1;
         } else {
             monthFormat = month.toString();
@@ -201,11 +203,13 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
          } else {
              dayFormat = index.toString();
          } 
-        const date = dayFormat +"/" + monthFormat + "/" + year;
+        let date = dayFormat +"/" + monthFormat + "/" + year;
         let event: any[] = [];
         if (events === []) {
+            console.log("Is monthlyDay Rerendering", index);
             return <Link className="days-of-month" to="/days" state={{date: date}}><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>
         } else {
+            // console.log("Is monthlyDay Rerendering in else", index);
             for (let item of events) {
                 
                 if (item.date === date) {
@@ -216,7 +220,10 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
                 }
     
             }
-            return <Link className="days-of-month" to="/days" state={{date: date, familyMembers: familyMembers}}><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>
+            console.log("this is event: ", event);
+            return (<Link className="days-of-month" to="/days" state={{date: date, familyMembers: familyMembers}}>
+                <MonthDayComponent day={index} month={month} year={year} event={event} key={index}/>
+                </Link>);
         }
        
         
@@ -230,6 +237,7 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
     }, []);
     useEffect(() => {
         allDaysInMonth(month, year);
+
     }, [month, year]);
     useEffect(() => {
         sessionStorage.setItem("events", JSON.stringify(events));
