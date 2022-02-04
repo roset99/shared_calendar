@@ -57,7 +57,7 @@ const DailyCalendar = () => {
 
     return (
         <div>
-            <h1>{location.state.date}</h1>
+            <h1 id="daily-date-title">{location.state.date}</h1>
             <section className="event-lists">
                 {attendeeList}
             </section>
