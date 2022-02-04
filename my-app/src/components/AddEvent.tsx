@@ -4,6 +4,7 @@ import { gql, useMutation } from '@apollo/client';
 import { EventInputInterface } from './Interfaces';
 import { AnyARecord } from 'dns';
 
+
 // || ==================== GraphQL Queries/Mutations ==================== ||
 
 const CREATE_EVENT = gql`
@@ -20,7 +21,7 @@ interface Props {
     // to do with opening and closing popup
     show: boolean;
     onClose: () => void;
-
+    onClickShowForm: () => void;
     // passed down to be inserted into addEvent request
     members: any;
     currentFamily: any;
@@ -29,12 +30,13 @@ interface Props {
     // whether is being displayed from month or day page
     day: string;
     refreshEvents: () => void;
+    
 }
 
 // || ==================== Component ==================== ||
 
 // const AddEvent: any = ({ show, onClose, family, members, day, refreshEvents }: Props) => {
-const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembers }: Props) => {
+const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembers, onClickShowForm }: Props) => {
     
     const [title, setTitle] = useState<string>("");
     const [date, setDate] = useState<string>("");
@@ -84,6 +86,14 @@ const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembe
         })
             .then(result => console.log(result))
             .then(() => refreshEvents())
+            .then(() => {
+                setDate("");
+                setAttendees([]);
+                setStartTime("");
+                setEndTime("");
+                setTitle("");
+            })
+            // .then(() =>onClickShowForm());
     }
    
     const memberDropdown = familyMembers.map((member: any) => {
@@ -113,8 +123,9 @@ const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembe
     // || ========== Render return ========== ||
 
     return (
-        <form className="event" onSubmit={(e) => handleSubmit(e)} >
-            <button type="button" onClick={onClose}>X</button>
+        <div className= "event">
+        <form className="event-form" onSubmit={(e) => handleSubmit(e)} >
+            <button type="button" className="close-button" onClick={onClose}>X</button>
             <h1>Add Event</h1>
 
             <label htmlFor='title'>Title</label>
@@ -145,6 +156,7 @@ const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembe
 
             <button type="submit">Submit</button>
         </form>
+        </div>
     )
 }
 

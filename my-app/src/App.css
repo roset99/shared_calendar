@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap");
 
 .App {
   text-align: center;
@@ -43,7 +43,7 @@
 /* Sign up/Login page */
 
 * {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
 }
 
 .signup,
@@ -55,13 +55,12 @@
   align-items: center;
 }
 
-@media (min-width: 320px){
-
+@media (min-width: 320px) {
   .loginbtn {
     border-radius: 10px;
     height: 2.5rem;
     width: 50%;
-    background: #FAC710;
+    background: #fac710;
     border: none;
     font-size: 18px;
     margin: 0.5rem 0 2rem 0;
@@ -91,7 +90,6 @@
   .signup-link {
     text-decoration: none;
   }
- 
 }
 
 @media (min-width: 768px) {
@@ -120,7 +118,6 @@
   .loginbtn {
     width: 15%;
   }
-
 }
 
 .signup > h1,
@@ -129,12 +126,10 @@
   margin: 0.2rem;
 }
 
-
 input[type="text"],
 input[type="date"],
 input[type="password"],
-select
-{
+select {
   padding: 0.2rem;
   margin-bottom: 1rem;
   border: 1px solid black;
@@ -166,14 +161,14 @@ select
   align-items: center;
   /* justify-content: space-around; */
   background: #f7f7f8;
-
 }
 
 #hp-header {
   text-align: center;
 }
 
-.hp-signup, .hp-login {
+.hp-signup,
+.hp-login {
   padding: 1rem 2rem;
   width: 4rem;
   text-align: center;
@@ -188,7 +183,7 @@ select
 }
 
 .hp-login {
-  background: #FAC710;
+  background: #fac710;
 }
 
 @media (min-width: 320px) {
@@ -209,7 +204,15 @@ select
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.5);
+
+  background: rgba(0, 0, 0, 0.5);
+}
+.event-form {
+  padding: 3em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ------------------------------------------------------------ */
@@ -217,4 +220,12 @@ select
 
 .clear {
   display: none;
+}
+
+/* ------------------------------------------------------------- */
+/* Daily Calendar */
+#daily-date-title {
+  text-align: center;
+  border-bottom: 2px dashed black;
+  padding: 1em;
 }

@@ -216,7 +216,7 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
                 }
     
             }
-            return <Link className="days-of-month" to="/days" state={{date: date}}><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>
+            return <Link className="days-of-month" to="/days" state={{date: date, familyMembers: familyMembers}}><MonthDayComponent day={index} month={month} year={year} event={event} key={index}/></Link>
         }
        
         
