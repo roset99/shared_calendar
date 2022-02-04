@@ -9,6 +9,7 @@ const DailyCalendar = () => {
     const [date, setDate] = useState("");
     const [events, setEvents] = useState<any>([]);
     const [eventFormShow, setEventFormShow] = useState<boolean>(false);
+    const [members, setMembers] = useState<any>([]);
 
     useEffect(() => {
         setDate(location.state.date);
@@ -18,6 +19,10 @@ const DailyCalendar = () => {
         if (eventDataString !== null ) {
             setEvents(JSON.parse(eventDataString) );
             }
+            console.log("this is family members: ", location.state.familyMembers);
+        if (location.state.familyMembers !== []){
+            setMembers(location.state.familyMembers);
+        }
            
                
     }, []);
@@ -30,7 +35,8 @@ const DailyCalendar = () => {
         setEventFormShow(!eventFormShow);
     };
 
-    const attendeeList = peopleTest.map( (person: any) => {
+    const attendeeList = members.map( (person: any) => {
+        console.log("this is person: ", person);
     const eventsList = events.map((item : any) => {
         if (item.date === date && item.attendees.map((att: any) => {return att.name}).includes(person.name)){
             return(
