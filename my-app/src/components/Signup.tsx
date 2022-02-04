@@ -81,7 +81,7 @@ function SignUp({onLoginSetFamily}:any): any {
         await createFamily({ 
             variables: {
                 input: { 
-                    email: email,
+                    email: email.toLowerCase(),
                     password: password
                 }
             } 

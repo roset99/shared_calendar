@@ -28,7 +28,7 @@ function Login({onLoginSetFamily}: Props): any {
 
         await login({
             variables: {
-                    email: email,
+                    email: email.toLowerCase(),
                     password: password
             }
         })
