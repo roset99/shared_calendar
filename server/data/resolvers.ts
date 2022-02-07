@@ -111,15 +111,13 @@ export const resolvers = {
             }
 
             // delete people in family.members
-            for (let i = 0; i < family.members.length; i++){
-                const personId = family.members[i]
-                await People.deleteOne({ _id: personId })
+            for (const personId of family.members){
+                await People.deleteOne({ _id: personId });
             }
         
             // delete events in family.events
-            for (let i = 0; i < family.events.length; i++){
-                const eventId = family.events[i]
-                await Events.deleteOne({ _id: eventId })
+            for (const eventId of family.events){
+                await Events.deleteOne({ _id: eventId });
             }
             
             // delete family from db
@@ -164,8 +162,7 @@ export const resolvers = {
             }
 
             // remove person from events attendees
-            for (let i = 0; i < person.events.length; i++) {
-                const eventId = person.events[i];
+            for (const eventId of person.events) {
                 await Events.updateOne({ _id: eventId }, { "$pull": { "attendees": person.id }});
             }
 
@@ -192,14 +189,13 @@ export const resolvers = {
             newEvent.id = newEvent._id;           
 
             // loop through input.attendees
-            for (let i = 0; i < input.attendees.length; i++) {
-                const personId: any = input.attendees[i].id;
+            for (const person of input.attendees) {
 
                 // add event.id to person.events
-                await People.updateOne({ _id: personId }, { "$push": { "events": { _id: newEvent.id }}});
+                await People.updateOne({ _id: person.id }, { "$push": { "events": { _id: newEvent.id }}});
 
                 // add person id to event attendees
-                newEvent.attendees.push(personId);  
+                newEvent.attendees.push(person.id);  
             }
 
             // save event to database
@@ -263,8 +259,7 @@ export const resolvers = {
             await Families.updateOne({ _id: familyId }, { "$pull": { "events": event.id }});
 
             // remove from person.events
-            for (let i = 0; i < event.attendees.length; i++) {
-                const personId = event.attendees[i];
+            for (const personId of event.attendees) {
                 await People.updateOne({ _id: personId }, { "$pull": { "events": event.id }});
             } 
             
