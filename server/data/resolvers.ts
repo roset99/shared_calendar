@@ -8,10 +8,11 @@ import { Families, People, Events } from './dbConnectors';
 
 // || ========== Resolver Map ========== ||
 
+// queries and mutations not currently in use have no auth, for dev use only
+
 export const resolvers = { 
     Query: {
         getAllFamilies: async () => {
-            // if (!user) { throw new Error("You are not logged in") }
             return Families.find({})
                 .populate({ path: 'members', populate: { path: 'events' }})
                 .populate({ path: 'events', populate: { path: 'attendees' }});
@@ -128,14 +129,18 @@ export const resolvers = {
             await Families.deleteOne({ _id: id });
             return ('Succesfully deleted family');
         },
-        createPerson: async (root: any, { input }: any) => { // in use/requires user authorization
+        createPerson: async (root: any, { input }: any, { token }: any) => { // in use/requires user authorization
+            // authorization
+            if (!token) { throw new Error("You are not logged in"); }
+            const familyId = token.user.id;
+
             // create new person db object and save in database
             const newPerson = new People({
                 name: input.name,
                 birthday: input.birthday,
                 events: input.events,
                 colour: input.colour,
-                family: input.family.id
+                family: familyId
             });
             
             newPerson.id = newPerson._id;
@@ -144,7 +149,6 @@ export const resolvers = {
 
             // push person.id to family.members
             // (could potentially use findOneAndUpdate as this also returns family)
-            const familyId = newPerson.family;
             await Families.updateOne({ _id: familyId }, { "$push": { "members": { _id: newPerson.id }}});
 
             // return person to be displayed
@@ -179,11 +183,15 @@ export const resolvers = {
 
             return ('Successfully deleted person');
         },
-        createEvent: async (root: any, { input }: any) => { // in use/requires user authorization
+        createEvent: async (root: any, { input }: any, { token }: any) => { // in use/requires user authorization
+            // authorization
+            if (!token) { throw new Error("You are not logged in"); }
+            const familyId = token.user.id;
+
             // create event db object using input
             const newEvent = new Events({
                 title: input.title,
-                family: input.family.id,
+                family: familyId,
                 attendees: [],
                 date: input.date,
                 startTime: input.startTime,
@@ -206,7 +214,6 @@ export const resolvers = {
             await newEvent.save();
 
             // add event to family.events
-            const familyId = newEvent.family;
             await Families.updateOne({ _id: familyId }, { "$push": { "events": { _id: newEvent.id }}});
 
             return Events.findById(newEvent.id)
