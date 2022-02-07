@@ -10,8 +10,8 @@ const SECRET = "createaverystrongsec34!retthatalsoincludes2423412wdsa324e34e";
 
 export const resolvers = { 
     Query: {
-        getAllFamilies: async (root: any, args: any, { user }: any) => {
-            if (!user) { throw new Error("You are not logged in") }
+        getAllFamilies: async (root: any, args: any) => {
+            // if (!user) { throw new Error("You are not logged in") }
             return Families.find({})
                 .populate({ path: 'members', populate: { path: 'events' }})
                 .populate({ path: 'events', populate: { path: 'attendees' }});
@@ -21,7 +21,7 @@ export const resolvers = {
                 .populate({ path: 'members', populate: { path: 'events' }})
                 .populate({ path: 'events', populate: { path: 'attendees' }});
         },
-        getFamilyById: async (root: any, { id }: any) => {
+        getFamilyById: async (root: any, { id }: any) => { // in use/requires user authorization
             return Families.findById(id)
                 .populate({ path: 'members', populate: { path: 'events' }})
                 .populate({ path: 'events', populate: { path: 'attendees' }});
@@ -53,7 +53,7 @@ export const resolvers = {
         },
     },
     Mutation: {
-        login: async (root: any, { email, password }: ILogin) => {
+        login: async (root: any, { email, password }: ILogin) => { // in use
             // see if family exists with email
             const user = await Families.findOne({ email: email });
             if (!user) { throw new Error(`No family with email: ${email}`) };
@@ -73,7 +73,7 @@ export const resolvers = {
 
             return token;
         },
-        register: async (root: any, { input }: any) => {
+        register: async (root: any, { input }: any) => { // in use
             // create family db object
             const newFamily = new Families({
                 name: input.name,
@@ -126,7 +126,7 @@ export const resolvers = {
             await Families.deleteOne({ _id: id });
             return ('Succesfully deleted family');
         },
-        createPerson: async (root: any, { input }: any) => {
+        createPerson: async (root: any, { input }: any) => { // in use/requires user authorization
             // create new person db object and save in database
             const newPerson = new People({
                 name: input.name,
@@ -178,7 +178,7 @@ export const resolvers = {
 
             return ('Successfully deleted person');
         },
-        createEvent: async (root: any, { input }: any) => {
+        createEvent: async (root: any, { input }: any) => { // in use/requires user authorization
             // create event db object using input
             const newEvent = new Events({
                 title: input.title,
