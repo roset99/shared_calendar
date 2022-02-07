@@ -91,7 +91,7 @@ export const resolvers = {
             newFamily.id = newFamily._id;
 
             // save to db and return family
-            newFamily.save();
+            await newFamily.save();
             
             // create and return token
             const token = jwt.sign(
@@ -109,32 +109,25 @@ export const resolvers = {
             return Families.findOneAndUpdate({ _id: input.id }, input, { new: true }) 
         },
         deleteFamily: async (root: any, { id }: any) => {
-            // get family from db with id
+            // get family to check 404
             const family = await Families.findById(id);
-            if (!family) {
-                throw new Error
-            }
+            if (!family) { throw new Error }
 
-            // delete people in family.members
-            for (const personId of family.members){
-                await People.deleteOne({ _id: personId });
-            }
-        
-            // delete events in family.events
-            for (const eventId of family.events){
-                await Events.deleteOne({ _id: eventId });
-            }
-            
-            // delete family from db
-            await Families.deleteOne({ _id: id });
-            return ('Succesfully deleted family');
+            // delete family, members, events concurrently
+            await Promise.all([
+                Families.deleteOne({ _id: id }),
+                People.deleteMany({ family: id }),
+                Events.deleteMany({ family: id }),
+            ]);
+
+            return ('Successfully deleted family');
         },
         createPerson: async (root: any, { input }: any, { token }: any) => { // in use/requires user authorization
             // authorization
             if (!token) { throw new Error("You are not logged in"); }
             const familyId = token.user.id;
 
-            // create new person db object and save in database
+            // create new person db object
             const newPerson = new People({
                 name: input.name,
                 birthday: input.birthday,
@@ -145,11 +138,11 @@ export const resolvers = {
             
             newPerson.id = newPerson._id;
 
-            newPerson.save();
-
-            // push person.id to family.members
-            // (could potentially use findOneAndUpdate as this also returns family)
-            await Families.updateOne({ _id: familyId }, { "$push": { "members": { _id: newPerson.id }}});
+            // save person in db and push to family.members
+            await Promise.all([
+                newPerson.save(),
+                Families.updateOne({ _id: familyId }, { "$push": { "members": { _id: newPerson.id }}}),
+            ]);
 
             // return person to be displayed
             return People.findById(newPerson.id)
@@ -159,27 +152,20 @@ export const resolvers = {
             // todo: validation for family and events (can or cannot change)
             await People.findOneAndUpdate({ _id: input.id }, input, { new: true });
 
-            return await People.findById(input.id)
+            return People.findById(input.id)
                 .populate({ path: 'family' }).populate({ path: 'events' });
         },
         deletePerson: async (root: any, { id }: any) => {
-            // get person from db
+            // get person to check 404
             const person = await People.findById(id);
-            if (!person) {
-                return ('Person not found');
-            }
+            if (!person) { return ('Person not found'); }
 
-            // remove person from events attendees
-            for (const eventId of person.events) {
-                await Events.updateOne({ _id: eventId }, { "$pull": { "attendees": person.id }});
-            }
-
-            // remove person from family.members
-            const familyId = person.family;
-            await Families.updateOne({ _id: familyId }, { "$pull": { "members": person.id }});
-
-            // delete person
-            await People.deleteOne({ _id: id });
+            // delete person, from family.members, from events.attendees concurrently
+            await Promise.all([
+                People.deleteOne({ _id: id }),
+                Families.updateOne({ "members": { "$in": id }}, { "$pull": { "members": id }}),
+                Events.updateMany({ "attendees": { "$in": id }}, { "$pull": { "attendees": id }}),
+            ]);
 
             return ('Successfully deleted person');
         },
@@ -198,23 +184,16 @@ export const resolvers = {
                 endTime: input.endTime
             });
 
-            newEvent.id = newEvent._id;           
+            for (const person of input.attendees) { newEvent.attendees.push(person.id); }
 
-            // loop through input.attendees
-            for (const person of input.attendees) {
-
-                // add event.id to person.events
-                await People.updateOne({ _id: person.id }, { "$push": { "events": { _id: newEvent.id }}});
-
-                // add person id to event attendees
-                newEvent.attendees.push(person.id);  
-            }
-
-            // save event to database
-            await newEvent.save();
-
-            // add event to family.events
-            await Families.updateOne({ _id: familyId }, { "$push": { "events": { _id: newEvent.id }}});
+            newEvent.id = newEvent._id;
+            
+            // save event, add to family.events, add to people.events concurrently
+            await Promise.all([
+                newEvent.save(),
+                Families.updateOne({ _id: familyId }, { "$push": { "events": { _id: newEvent.id }}}),
+                People.updateMany({ _id: { "$in": newEvent.attendees }}, { "$push": { "events": { _id: newEvent.id }}}),
+            ]);
 
             return Events.findById(newEvent.id)
                 .populate({ path: 'attendees', populate: { path: 'family' }})
@@ -251,29 +230,22 @@ export const resolvers = {
             //     }
             // }
            
-            return await Events.findById(input.id, () => {})
+            return Events.findById(input.id, () => {})
                 .populate({ path: 'attendees', populate: { path: 'family' }})
                 .populate({ path: 'family', populate: { path: 'members' }});    
         },
         deleteEvent: async (root: any, { id }: any) => {
-            // get event from database by id
+            // get event by id to check 404
             const event = await Events.findById(id);          
-            if (!event) {
-                throw new Error("Error");
-            }
+            if (!event) { throw new Error("Error"); }
 
-            // delete event from db
-            await Events.deleteOne({ _id: id });
+            // delete event, from family.events, from people.events concurrently
+            await Promise.all([
+                Events.deleteOne({ _id: id }),
+                Families.updateOne({ "events": { "$in": id } }, { "$pull": { "events": id }}),
+                People.updateMany({ "events": { "$in": id }}, { "$pull": { "events": id }}),
+            ]);
 
-            // remove event form family.events
-            const familyId = event.family;
-            await Families.updateOne({ _id: familyId }, { "$pull": { "events": event.id }});
-
-            // remove from person.events
-            for (const personId of event.attendees) {
-                await People.updateOne({ _id: personId }, { "$pull": { "events": event.id }});
-            } 
-            
             return ('Successfully deleted event');
         },
     },
