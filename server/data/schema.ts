@@ -49,7 +49,7 @@ export const typeDefs = gql`
         getOnePerson(id: ID): Person
         getOneEvent(id: ID): Event
         getEventsByFamily(family: FamilyInput): [Event]
-        getFamilyById(id: ID): Family
+        getFamilyById: Family
     }
 
     input PersonInput {

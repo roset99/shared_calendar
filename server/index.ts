@@ -13,16 +13,16 @@ const server = new ApolloServer({
     typeDefs, 
     resolvers,
     context: async ({ req }) => {
-        const token = req.headers.authorization || '';
-        let user;
+        const unverifiedToken = req.headers.authorization || '';
+        let token;
         try {
-            user = jwt.verify(token, SECRET);
-            console.log(`${(<any>user).user.id} user`);
+            token = jwt.verify(unverifiedToken, SECRET);
+            console.log(`Request from Family ID: ${(<any>token).user.id}`);
         } catch (error) {
-            console.log(`${error.message} caught`);
+            token = null;
         }
 
-        return { user, SECRET };
+        return { token, SECRET };
     }
 });
 

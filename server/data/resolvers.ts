@@ -4,13 +4,13 @@ import jwt from 'jsonwebtoken';
 import { Families, People, Events } from './dbConnectors';
 
 // SECRET
-const SECRET = "createaverystrongsec34!retthatalsoincludes2423412wdsa324e34e";
+// const SECRET = "createaverystrongsec34!retthatalsoincludes2423412wdsa324e34e";
 
 // || ========== Resolver Map ========== ||
 
 export const resolvers = { 
     Query: {
-        getAllFamilies: async (root: any, args: any) => {
+        getAllFamilies: async () => {
             // if (!user) { throw new Error("You are not logged in") }
             return Families.find({})
                 .populate({ path: 'members', populate: { path: 'events' }})
@@ -21,8 +21,12 @@ export const resolvers = {
                 .populate({ path: 'members', populate: { path: 'events' }})
                 .populate({ path: 'events', populate: { path: 'attendees' }});
         },
-        getFamilyById: async (root: any, { id }: any) => { // in use/requires user authorization
-            return Families.findById(id)
+        getFamilyById: async (root: any, args: any, { token }: any) => { // in use/requires user authorization
+            // authorization
+            if (!token) { throw new Error("You are not logged in"); }
+
+            // get family using id
+            return Families.findById(token.user.id)
                 .populate({ path: 'members', populate: { path: 'events' }})
                 .populate({ path: 'events', populate: { path: 'attendees' }});
         },
@@ -53,7 +57,7 @@ export const resolvers = {
         },
     },
     Mutation: {
-        login: async (root: any, { email, password }: ILogin) => { // in use
+        login: async (root: any, { email, password }: ILogin, { SECRET }: any) => { // in use
             // see if family exists with email
             const user = await Families.findOne({ email: email });
             if (!user) { throw new Error(`No family with email: ${email}`) };
@@ -73,7 +77,7 @@ export const resolvers = {
 
             return token;
         },
-        register: async (root: any, { input }: any) => { // in use
+        register: async (root: any, { input }: any, { SECRET }: any) => { // in use
             // create family db object
             const newFamily = new Families({
                 name: input.name,
