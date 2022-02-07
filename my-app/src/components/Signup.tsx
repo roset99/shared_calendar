@@ -1,14 +1,10 @@
-
-import e from 'express';
 import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';        
+import { useNavigate } from "react-router-dom"
 
-const CREATE_FAMILY = gql`
-    mutation CreateFamily($input: FamilyInput) {
-        createFamily(input: $input){
-            email
-            password
-        }
+const REGISTER = gql`
+    mutation Register($input: FamilyInput) {
+        register(input: $input)
     }
 `;
 
@@ -18,11 +14,13 @@ function validateEmail (email: string) {
   }
 
 function validatePassword (pwd: string) {
-    const regexp = /"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"/;
+    const regexp = /^(?=.*\d)(?=.*[!@#$%^&*.])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
     return regexp.test(pwd);
 }
 
-function SignUp(): any {
+function SignUp({onLoginSetFamily}:any): any {
+
+    const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -35,16 +33,19 @@ function SignUp(): any {
     const [errorPwdMsg, setErrorPwdMsg] = useState("");
     const [repwdError, setRepwdError] = useState(false)
 
+    const [register, {data, loading, error}] = useMutation(REGISTER);
 
-    const [createFamily, { data, loading, error }] = useMutation(CREATE_FAMILY);
 
     if (loading) return 'Submitting...';
     if (error) return `Submission error! ${error.message}`;
     
     let invalid = false;
 
-    const doStuff = (e: React.FormEvent) => {
+    const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        console.log(email, validateEmail(email));
+        console.log(password, validatePassword(password))
 
         if(email === "" || email === null) {
             setEmailError(true);
@@ -57,7 +58,7 @@ function SignUp(): any {
             invalid = true;
         }
 
-        if(!validateEmail(password)) {
+        if(!validatePassword(password)) {
             setPwdError(true);
             setErrorPwdMsg("Password must contain: Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character")
             invalid = true;
@@ -72,23 +73,30 @@ function SignUp(): any {
             return
         }
 
-
-        createFamily({ 
+        await register({ 
             variables: {
                 input: { 
                     email: email,
                     password: password
                 }
             } 
-        });
-
+        })
+            .then((result) => {
+                console.log(result.data);
+                onLoginSetFamily(result.data.register)
+            });
+        
+        navigate("/members");
     }
+
+
+
 
     const handleEmail = (e: any) => {
         setEmail(e.target.value);
     }
 
-    const handlePassword = (e: any) => {
+    const handlePassword = async (e: any) => {
         setPassword(e.target.value);
     }
 
@@ -96,9 +104,11 @@ function SignUp(): any {
         setRepassword(e.target.value);
     }
 
+
+
     return (  
         <>
-            <form onSubmit={doStuff} className="signup">
+            <form onSubmit={handleSignup} className="signup">
                 <h1>Sign up</h1>
 
                 <label htmlFor="email">Email</label>
@@ -120,32 +130,3 @@ function SignUp(): any {
 }
  
 export default SignUp;
-
-
-// const query = 
-        // `mutation CreateFamily($input: FamilyInput) {
-        //     createFamily(input: $input){
-        //         id
-        //         email
-        //         password
-        //     }
-        // }`;
-
-        // fetch('http://localhost:8080/graphql', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //         'Accept': 'application/json'
-        //     },
-        //     body: JSON.stringify({
-        //         query,
-        //         variables: {
-        //             input: {
-        //                 email,
-        //                 password
-        //             }
-        //         }
-        //     })
-        // })
-        //     .then(r => r.json())
-        //     .then(data =>  console.log(data));

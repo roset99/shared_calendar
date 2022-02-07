@@ -2,14 +2,6 @@ import { Schema, model, connect, Types } from 'mongoose';
 
 // || ========== Mongo connection ========== ||
 
-// -- old connection
-// mongoose.Promise = global.Promise;
-// mongoose.connect('mongodb://localhost/calendar', {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-// });
-
-// -- new connection
 main().catch(err => console.log(err));
 async function main(): Promise<void> {
     await connect('mongodb://localhost/calendar', {
@@ -21,7 +13,7 @@ async function main(): Promise<void> {
 // || ========== Schemas and Interfaces ========== ||
 
 export interface Family {
-    familyName: string;
+    name: string;
     email: string;
     password: string;
     members: Types.ObjectId[];
@@ -29,7 +21,7 @@ export interface Family {
 }
 
 const familySchema = new Schema<Family>({
-    familyName: { type: String },
+    name: { type: String },
     email: { type: String },
     password: { type: String },
     members: [{ type: Types.ObjectId, ref: 'people' }],

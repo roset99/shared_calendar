@@ -1,16 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';   
-import { Link } from 'react-router-dom';
-//import GetFamily from './GetFamily';
+import React, { useState } from 'react';
+import { gql, useMutation} from '@apollo/client';
+import './CreatePersonComponent.css';
+import { Link, useNavigate } from 'react-router-dom';
 
 const CREATE_PERSON = gql`
     mutation CreatePerson($input: PersonInput) {
         createPerson(input: $input){
             name
             birthday 
-            events {
-               id
-            }
             colour
             family {
                 id
@@ -18,71 +15,37 @@ const CREATE_PERSON = gql`
         }
     }
 `;
-const GET_FAMILY = gql`
-    query {
-       getAllFamilies {
-           id
-           email
-            members {
-               name 
-               colour 
-           }
-            events {
-                 id
-             }
-   }}
-`;
 
-function availableColours() {
- // compare each family.members.colour value to array of colours 
- // if in use, do not display in select colour  
- const colours: string[] = ["ffadad", "ffd6a5", "fdffb6", "caffbf", "a0c4ff", "bdb2ff", "ffc6ff"];   
-}
-
-
-const CreatePerson: any = ({}) => {
-    const {data: getFamilyData, loading, error} = useQuery(GET_FAMILY);
-    console.log(getFamilyData);
+const CreatePerson: any = ({ currentFamily}: any) => {
     
-    const [name, setName] = useState("");
-    // const [name, setName] = useState<string>(""); <- included data type
-    const [birthday, setBirthday] = useState("");
-    const [event, setEvent] = useState("");
-    const [colour, setColour] = useState("");
-    const [family, setFamily] = useState("");
+    const redirect = useNavigate();
+
+    const [name, setName] = useState<string>("");
+    const [birthday, setBirthday] = useState<string>("");
+    const [colour, setColour] = useState<string>("");
     const [createPerson, { data: createPersonData, loading: personLoading, error: personError }] = useMutation(CREATE_PERSON);
-   const [familyData, setFamilyData] = useState([]);
-    
-    useEffect(() => {
-        if(getFamilyData){
-        setFamilyData(getFamilyData.getAllFamilies);
-        }
-    }, []);
 
-    const colours: string[] = ["ffadad", "ffd6a5", "fdffb6", "caffbf", "a0c4ff", "bdb2ff", "ffc6ff"]; 
+    const coloursObj: {}[] = [{value:"ffadad", text:"Red"}, {value:"ffd6a5", text:"Orange"}, {value: "fdffb6", text:"Yellow"}, {value: "caffbf", text:"Green"}, {value:"a0c4ff", text:"Blue"}, {value: "bdb2ff", text:"Purple"}, {value:"ffc6ff", text:"Pink"}];
 
     if (personLoading) return 'Submitting...';
     if (personError) return `Submission error! ${personError.message}`;
-    if (loading) return 'loading...';
-    if (error) return `Error: ${error.message}`;
-   
-    
-     const addPerson = (e: React.FormEvent) => {
+  
+    const addPerson = (e: React.FormEvent) => {
         e.preventDefault();
-
-            createPerson({
-                variables: {
-                    input: {
-                        name: name,
-                        birthday: birthday,
-                        event: event,
-                        colour: colour, 
-                        family: family
-                    }
-                }
-            })
-        }
     
+        createPerson({
+            variables: {
+                input: {
+                    name: name,
+                    birthday: birthday,
+                    colour: colour,
+                    family: currentFamily
+                }
+            }
+        })
+        redirect("/month-calendar");
+    }
+
     const handleName = (e: any) => {
         setName(e.target.value)
     }
@@ -91,60 +54,34 @@ const CreatePerson: any = ({}) => {
         setBirthday(e.target.value)
     }
 
-    const handleEvents = (e: any) => {
-        setEvent(e.target.value)
-    }
-
     const handleColour = (e: any) => {
         setColour(e.target.value)
-    }
-
-    const handleFamily = (e: any) => {
-        setFamily(e.target.value)
+        console.log("colour is", colour)
     }
 
     return (
-      <>
-            <form id="add-person" onSubmit={addPerson} >
+        <section className="create-person-container">
+            <form id="add-person" onSubmit={addPerson} className="form" >
                 <h1>Add family member</h1>
 
                 <label htmlFor="name">Name</label>
-                <input type="text" id="name" className='person-input' onChange={handleName}/>
+                <input type="text" id="name" className='person-input' onChange={handleName} />
 
                 <label htmlFor="birthday">Birthday</label>
-                <input type="date" id="birthday" className='person-input' onChange={handleBirthday}/>
-
-                <label htmlFor="events">Events</label>
-                <input type="text" id="events" className='person-input' onChange={handleEvents} />
+                <input type="date" id="birthday" className='person-input' onChange={handleBirthday} />
 
                 <label htmlFor="colour">Choose colour</label>
-                <select name="colour" id="colour" onChange={handleColour}>
+                <select name="colour" id="colour" onChange={handleColour} className="select-input">
                     <option value="">Select colour</option>
-                    {colours.map((c: any, i) => (
-                  <option key={i}>{c}</option>
-              )) }
+                    {coloursObj.map(({value, text}: any) => (
+                        <option key={value} value={value}>{text}</option>
+                    ))}
                 </select>
-
-                <label htmlFor="family">Family</label>
-                <select name="select-family" id="select-family" onChange={handleFamily} >
-                    <option value="" disabled >Select family</option>
-                    {getFamilyData.getAllFamilies.map((f: any) => (
-                   <option key={f.id} value={f.email}>
-                       {f.email}
-                   </option>
-               ))} 
-                </select> 
-
-                <button type="submit" className="submit-person" id="submit-btn" >Submit Person</button>
+               <button type="submit" className="submit-person-btn" id="submit-btn" >Submit Person</button>
             </form >
-           
-            <div>
-          
-            </div>
-          <Link to="/family">get family</Link>
-   </>
+                <Link to="/month-calendar" className="month-cal-link">Go to Monthly Calendar</Link>
+        </section>
     )
 }
 export default CreatePerson;
 
-// make family required 

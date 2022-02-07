@@ -1,18 +1,31 @@
-import express from 'express';
-import cors from 'cors';
-import { graphqlHTTP }  from 'express-graphql';
-import { schema } from './data/schema';
+import { ApolloServer } from 'apollo-server'; 
+import jwt from 'jsonwebtoken';
 
-const app = express();
+import { typeDefs } from './data/schema';
+import { resolvers } from './data/resolvers';
 
-app.get('/', (req, res) => {
-    res.send('Graphql is amazing!');
+// SECRET
+const SECRET = "createaverystrongsec34!retthatalsoincludes2423412wdsa324e34e";
+
+// || ========== Apollo Server ========== ||
+
+const server = new ApolloServer({ 
+    typeDefs, 
+    resolvers,
+    context: async ({ req }) => {
+        const token = req.headers.authorization || '';
+        let user;
+        try {
+            user = jwt.verify(token, SECRET);
+            console.log(`${(<any>user).user.id} user`);
+        } catch (error) {
+            console.log(`${error.message} caught`);
+        }
+
+        return { user, SECRET };
+    }
 });
 
-app.use(cors());
-app.use('/graphql', graphqlHTTP({
-    schema: schema,
-    graphiql: true,
-}));
-
-app.listen(8080, () => console.log('Running on server port localhost:8080/graphql'));
+server.listen().then(({ url }) => {
+    console.log(`🚀 Server ready at ${url}`);
+})

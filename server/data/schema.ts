@@ -1,7 +1,8 @@
-import { makeExecutableSchema } from 'graphql-tools';
-import { resolvers } from './resolvers';
+import { gql } from 'apollo-server';
 
-const typeDefs = `
+// || ========== Schema/TypeDefs ========== ||
+
+export const typeDefs = gql`
     type Person {
         id: ID
         name: String
@@ -23,7 +24,7 @@ const typeDefs = `
 
     type Family {
         id: ID
-        familyName: String
+        name: String
         email: String
         password: String
         members: [Person]
@@ -62,7 +63,7 @@ const typeDefs = `
 
     input FamilyInput {
         id: ID
-        familyName: String
+        name: String
         email: String
         password: String
         members: [PersonInput]
@@ -87,7 +88,8 @@ const typeDefs = `
     }
 
     type Mutation {
-        createFamily(input: FamilyInput): Family
+        login(email: String, password: String): String
+        register(input: FamilyInput): String
         updateFamily(input: FamilyInput): Family
         deleteFamily(id: ID!): String
         createPerson(input: PersonInput): Person
@@ -98,7 +100,3 @@ const typeDefs = `
         deleteEvent(id: ID!): String
     }
 `;
-
-const schema = makeExecutableSchema({ typeDefs, resolvers });
-
-export { schema };
