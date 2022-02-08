@@ -241,40 +241,38 @@ export const resolvers = {
                 .populate({ path: 'family', populate: { path: 'members' }});
         },
         updateEvent: async (root: any, { input }: any) => {
-            // this mutation needs much work
+            // get event by id to check 404
+            const oldEvent = await Events.findById(input.id);          
+            if (!oldEvent) { throw new UserInputError(`No event with ID: ${input.id}`); }
 
-            // const oldEvent = await Events.findOneAndUpdate({ _id: input.id }, input, { new: false }, () => {});
-            // const newEvent = await Events.findById(input.id, (err) => {});
+            // generate updated event from input
+            const updatedEvent = input;
 
-            // const oldEvent = await Events.findById(input.id);
-            await Events.findOneAndUpdate({ _id: input.id }, input);
+            // update attendees if updatedEvent.attendees is not null
+            if (updatedEvent.attendees) {
+                // map attendees objects to IDs
+                updatedEvent.attendees = updatedEvent.attendees.map((person: any) => { return person.id });
 
-            // const newEvent = await Events.findById(input.id);
-            // const newEvent = await Events.findOneAndUpdate({ _id: input.id }, input, { new: true }, () => {});
-          
-
-            // get person and push updated event to their events list
-            // for (let i=0; i < newEvent.attendees.length; i++) {
-
-            //     // if person added to event
-            //     const person = await People.findById(newEvent.attendees[i]);
+                // check all attendees are valid
+                const people = await Promise.all(
+                    updatedEvent.attendees.map(async (personId: any) => {
+                        return People.findById(personId);
+                    })
+                );
                 
-            //     if (!person.events.includes(newEvent.id)) {
-            //         person.events.push(newEvent.id)
-            //         await People.updateOne({ _id: person.id }, person, { new: true }, () => {}) 
-            //     }
-            // }
-
-            // for (let i=0; i < oldEvent.attendees.length; i++){
-            //     // if newEvent !includes attendee, remove attendee 
-            //     if (!newEvent.attendees.includes(oldEvent.attendees[i])) {
-            //         const person = await People.findById(oldEvent.attendees[i])
-            //         person.events.pull(oldEvent.id) // remove oldEvent from person's events array
-            //         person.save()
-            //     }
-            // }
+                for (const i in people) {
+                    if (!people[i]) { throw new UserInputError(`No person with ID: ${updatedEvent.attendees[i]}`); }
+                }
+                
+                // remove event from old attendees list and add event to new attendees list
+                await People.updateMany({ _id: { "$in": oldEvent.attendees }}, { "$pull": { "events": oldEvent.id }});
+                await People.updateMany({ _id: { "$in": updatedEvent.attendees }}, { "$push": { "events": { _id: updatedEvent.id }}});
+            }
+            
+            // update event in db
+            await Events.findOneAndUpdate({ _id: input.id }, updatedEvent);
            
-            return Events.findById(input.id, () => {})
+            return Events.findById(input.id)
                 .populate({ path: 'attendees', populate: { path: 'family' }})
                 .populate({ path: 'family', populate: { path: 'members' }});    
         },
