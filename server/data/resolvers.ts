@@ -44,9 +44,12 @@ export const resolvers = {
                 .populate({ path: 'events', populate: { path: 'family' }});
         },
         getOnePerson: async (root: any, { id }: any) => {
-            return People.findById(id)
+            const person = await People.findById(id)
                 .populate({ path: 'family', populate: { path: 'events' }})
                 .populate({ path: 'events', populate: { path: 'family' }});
+            
+            if (!person) { throw new UserInputError(`No person with ID: ${id}`); }
+            return person;
         },
         getAllEvents: async () => {
             return Events.find({})
@@ -54,14 +57,20 @@ export const resolvers = {
                 .populate({ path: 'family', populate: { path: 'members' }});
         },
         getOneEvent: async (root: any, { id }: any) => {
-            return Events.findById(id)
+            const event = await Events.findById(id)
                 .populate({ path: 'attendees', populate: { path: 'family' }})
                 .populate({ path: 'family', populate: { path: 'members' }});
+
+            if (!event) { throw new UserInputError(`No event with ID: ${id}`); }
+            return event;
         },
         getEventsByFamily: async (root: any, { family }: any) => {
-            return Events.find({family: family.id})
+            const event = await Events.find({family: family.id})
                 .populate({ path: 'attendees', populate: { path: 'family' }})
                 .populate({ path: 'family', populate: { path: 'members' }});
+
+            if (!event) { throw new UserInputError(`No event with Family ID: ${family.id}`); }
+            return event;
         },
     },
     Mutation: {
@@ -113,12 +122,15 @@ export const resolvers = {
         },
         updateFamily: async (root: any, { input }: any) => {
             // cannot update members and events with this
-            return Families.findOneAndUpdate({ _id: input.id }, input, { new: true }) 
+            const family = await Families.findOneAndUpdate({ _id: input.id }, input, { new: true });
+
+            if (!family) { throw new UserInputError(`No family with ID: ${input.id}`); }
+            return family;
         },
         deleteFamily: async (root: any, { id }: any) => {
             // get family to check 404
             const family = await Families.findById(id);
-            if (!family) { throw new Error }
+            if (!family) { throw new UserInputError(`No family with ID: ${id}`); }
 
             // delete family, members, events concurrently
             await Promise.all([
@@ -133,6 +145,11 @@ export const resolvers = {
             // authorization
             if (!user) { throw new AuthenticationError("You are not logged in"); }
             const familyId = user.id;
+
+            // check family id exists
+            // currently only needed as jwt may not have expired
+            const family = await Families.findById(familyId);
+            if (!family) { throw new UserInputError(`No family with ID: ${familyId}`); }
 
             // create new person db object
             const newPerson = new People({
@@ -157,7 +174,8 @@ export const resolvers = {
         },
         updatePerson: async (root: any, { input }: any) => {
             // todo: validation for family and events (can or cannot change)
-            await People.findOneAndUpdate({ _id: input.id }, input, { new: true });
+            const person = await People.findOneAndUpdate({ _id: input.id }, input, { new: true });
+            if (!person) { throw new UserInputError(`No person with ID: ${input.id}`); }
 
             return People.findById(input.id)
                 .populate({ path: 'family' }).populate({ path: 'events' });
@@ -165,7 +183,7 @@ export const resolvers = {
         deletePerson: async (root: any, { id }: any) => {
             // get person to check 404
             const person = await People.findById(id);
-            if (!person) { return ('Person not found'); }
+            if (!person) { throw new UserInputError(`No person with ID: ${id}`); }
 
             // delete person, from family.members, from events.attendees concurrently
             await Promise.all([
@@ -181,6 +199,11 @@ export const resolvers = {
             if (!user) { throw new AuthenticationError("You are not logged in"); }
             const familyId = user.id;
 
+            // check family id exists
+            // currently only needed as jwt may not have expired
+            const family = await Families.findById(familyId);
+            if (!family) { throw new UserInputError(`No family with ID: ${familyId}`); }
+
             // create event db object using input
             const newEvent = new Events({
                 title: input.title,
@@ -194,7 +217,18 @@ export const resolvers = {
             for (const person of input.attendees) { newEvent.attendees.push(person.id); }
 
             newEvent.id = newEvent._id;
+
+            // check all attendees are valid
+            const people = await Promise.all(
+                newEvent.attendees.map(async (personId) => {
+                    return People.findById(personId);
+                })
+            );
             
+            for (const i in people) {
+                if (!people[i]) { throw new UserInputError(`No person with ID: ${newEvent.attendees[i]}`); }
+            }
+
             // save event, add to family.events, add to people.events concurrently
             await Promise.all([
                 newEvent.save(),
@@ -207,11 +241,14 @@ export const resolvers = {
                 .populate({ path: 'family', populate: { path: 'members' }});
         },
         updateEvent: async (root: any, { input }: any) => {
+            // this mutation needs much work
+
             // const oldEvent = await Events.findOneAndUpdate({ _id: input.id }, input, { new: false }, () => {});
             // const newEvent = await Events.findById(input.id, (err) => {});
 
             // const oldEvent = await Events.findById(input.id);
             await Events.findOneAndUpdate({ _id: input.id }, input);
+
             // const newEvent = await Events.findById(input.id);
             // const newEvent = await Events.findOneAndUpdate({ _id: input.id }, input, { new: true }, () => {});
           
@@ -244,7 +281,7 @@ export const resolvers = {
         deleteEvent: async (root: any, { id }: any) => {
             // get event by id to check 404
             const event = await Events.findById(id);          
-            if (!event) { throw new Error("Error"); }
+            if (!event) { throw new UserInputError(`No event with ID: ${id}`); }
 
             // delete event, from family.events, from people.events concurrently
             await Promise.all([
