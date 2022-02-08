@@ -18,11 +18,11 @@ const server = new ApolloServer({
         try {
             token = jwt.verify(unverifiedToken, SECRET);
             console.log(`Request from Family ID: ${(<any>token).user.id}`);
+            return { user: (<any>token).user, SECRET };
         } catch (error) {
-            token = null;
+            // console.log(`Error caught: ${error.message}`);
+            return { user: null, SECRET };
         }
-
-        return { token, SECRET };
     }
 });
 

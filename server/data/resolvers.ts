@@ -22,12 +22,12 @@ export const resolvers = {
                 .populate({ path: 'members', populate: { path: 'events' }})
                 .populate({ path: 'events', populate: { path: 'attendees' }});
         },
-        getFamilyById: async (root: any, args: any, { token }: any) => { // in use/requires user authorization
+        getFamilyById: async (root: any, args: any, { user }: any) => { // in use/requires user authorization
             // authorization
-            if (!token) { throw new Error("You are not logged in"); }
+            if (!user) { throw new Error("You are not logged in"); }
 
             // get family using id
-            return Families.findById(token.user.id)
+            return Families.findById(user.id)
                 .populate({ path: 'members', populate: { path: 'events' }})
                 .populate({ path: 'events', populate: { path: 'attendees' }});
         },
@@ -122,10 +122,10 @@ export const resolvers = {
 
             return ('Successfully deleted family');
         },
-        createPerson: async (root: any, { input }: any, { token }: any) => { // in use/requires user authorization
+        createPerson: async (root: any, { input }: any, { user }: any) => { // in use/requires user authorization
             // authorization
-            if (!token) { throw new Error("You are not logged in"); }
-            const familyId = token.user.id;
+            if (!user) { throw new Error("You are not logged in"); }
+            const familyId = user.id;
 
             // create new person db object
             const newPerson = new People({
@@ -169,10 +169,10 @@ export const resolvers = {
 
             return ('Successfully deleted person');
         },
-        createEvent: async (root: any, { input }: any, { token }: any) => { // in use/requires user authorization
+        createEvent: async (root: any, { input }: any, { user }: any) => { // in use/requires user authorization
             // authorization
-            if (!token) { throw new Error("You are not logged in"); }
-            const familyId = token.user.id;
+            if (!user) { throw new Error("You are not logged in"); }
+            const familyId = user.id;
 
             // create event db object using input
             const newEvent = new Events({
