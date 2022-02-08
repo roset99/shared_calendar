@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { AuthenticationError, UserInputError } from 'apollo-server';
 
 import { Families, People, Events } from './dbConnectors';
 
@@ -18,18 +19,24 @@ export const resolvers = {
                 .populate({ path: 'events', populate: { path: 'attendees' }});
         },
         getOneFamily: async (root: any, { email }: any) => {
-            return Families.findOne({ email: email })
+            const family = await Families.findOne({ email: email })
                 .populate({ path: 'members', populate: { path: 'events' }})
                 .populate({ path: 'events', populate: { path: 'attendees' }});
+
+            if (!family) { throw new UserInputError(`No family with email: ${email}`); }
+            return family;
         },
         getFamilyById: async (root: any, args: any, { user }: any) => { // in use/requires user authorization
             // authorization
-            if (!user) { throw new Error("You are not logged in"); }
+            if (!user) { throw new AuthenticationError("You are not logged in"); }
 
             // get family using id
-            return Families.findById(user.id)
+            const family = await Families.findById(user.id)
                 .populate({ path: 'members', populate: { path: 'events' }})
                 .populate({ path: 'events', populate: { path: 'attendees' }});
+
+            if (!family) { throw new UserInputError(`No family with ID: ${user.id}`); }
+            return family;
         },
         getAllPeople: async () => {
             return People.find({})
@@ -61,11 +68,11 @@ export const resolvers = {
         login: async (root: any, { email, password }: ILogin, { SECRET }: any) => { // in use
             // see if family exists with email
             const user = await Families.findOne({ email: email });
-            if (!user) { throw new Error(`No family with email: ${email}`) };
+            if (!user) { throw new UserInputError(`No family with email: ${email}`); }
 
             // check if password is correct
             const isValid = await bcrypt.compare(password, user.password);
-            if (!isValid) { throw new Error("Incorrect password") };
+            if (!isValid) { throw new UserInputError("Incorrect password"); }
 
             // create and return token
             const token = jwt.sign(
@@ -124,7 +131,7 @@ export const resolvers = {
         },
         createPerson: async (root: any, { input }: any, { user }: any) => { // in use/requires user authorization
             // authorization
-            if (!user) { throw new Error("You are not logged in"); }
+            if (!user) { throw new AuthenticationError("You are not logged in"); }
             const familyId = user.id;
 
             // create new person db object
@@ -171,7 +178,7 @@ export const resolvers = {
         },
         createEvent: async (root: any, { input }: any, { user }: any) => { // in use/requires user authorization
             // authorization
-            if (!user) { throw new Error("You are not logged in"); }
+            if (!user) { throw new AuthenticationError("You are not logged in"); }
             const familyId = user.id;
 
             // create event db object using input
