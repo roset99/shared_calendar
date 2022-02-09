@@ -13,7 +13,7 @@ const LOGIN = gql`
     }
 `;
 
-function Login({onLoginSetFamily}: Props): any {
+function Login({ onLoginSetFamily }: Props): any {
 
     const navigate = useNavigate();
     const [login, {data, loading, error}] = useMutation(LOGIN);
@@ -34,7 +34,8 @@ function Login({onLoginSetFamily}: Props): any {
         })
         .then(
             (results) => {
-                onLoginSetFamily({id: results.data.login})
+                console.log (results.data.login);
+                onLoginSetFamily(results.data.login);
             }
         )
         navigate("/month-calendar");

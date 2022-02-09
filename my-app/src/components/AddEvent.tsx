@@ -66,7 +66,7 @@ const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembe
 
         const newEvent: EventInputInterface = {
             title: title,
-            family: currentFamily,
+            // family: currentFamily,
             attendees: attendeesMod,
 
             date: dateFormat,
@@ -78,7 +78,7 @@ const AddEvent: any = ({ onClose, day, refreshEvents, currentFamily, familyMembe
             variables: {
                 input: { 
                     title: newEvent.title,
-                    family: newEvent.family,
+                    // family: newEvent.family,
                     attendees: newEvent.attendees,
                     date: newEvent.date,
                     startTime: newEvent.startTime,

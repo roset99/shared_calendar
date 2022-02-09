@@ -16,7 +16,7 @@ const CREATE_PERSON = gql`
     }
 `;
 
-const CreatePerson: any = ({ currentFamily}: any) => {
+const CreatePerson: any = ({ currentFamily }: any) => {
     
     const redirect = useNavigate();
 
@@ -39,7 +39,6 @@ const CreatePerson: any = ({ currentFamily}: any) => {
                     name: name,
                     birthday: birthday,
                     colour: colour,
-                    family: currentFamily
                 }
             }
         })

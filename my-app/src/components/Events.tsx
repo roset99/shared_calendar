@@ -46,7 +46,7 @@ const Events: any = () => {
             variables: {
                 input: { 
                     title: newEvent.title,
-                    family: newEvent.family,
+                    // family: newEvent.family,
                     attendees: newEvent.attendees,
                     date: newEvent.date,
                     startTime: newEvent.startTime,

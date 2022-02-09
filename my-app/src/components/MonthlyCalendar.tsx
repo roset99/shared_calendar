@@ -35,34 +35,32 @@ query GetEventsByFamily($family: FamilyInput){
     }
 }`;
 const GET_FAMILY = gql`
-query GetFamilyById($id: ID){
-    getFamilyById(id: $id){
-        name
-        email
-        members{
-            id
+    query GetFamilyById {
+        getFamilyById {
             name
-            birthday
-            colour
-        }
-        events{
-            id
-            attendees {
+            email
+            members {
+                id
                 name
+                birthday
                 colour
             }
-            date 
-            startTime
-            endTime
-            title 
+            events {
+                id
+                attendees {
+                    name
+                    colour
+                }
+                date 
+                startTime
+                endTime
+                title 
+            }
         }
-    }
-        
-
     }
 `
 
-const MonthlyCalendar = ({currentFamily}: any): any => {
+const MonthlyCalendar = ({ currentFamily }: any): any => {
     
     const [month, setMonth] = useState<number>(0);
     const [year, setYear] = useState<number>(0);
@@ -75,7 +73,7 @@ const MonthlyCalendar = ({currentFamily}: any): any => {
     const [filteredMembers, setFilteredMembers] = useState<any[]>(familyMembers);
     
     const [dateClicked, setDateClicked] = useState<string>("");
-    const { loading, error, data, refetch } = useQuery(GET_FAMILY, {variables: {id: currentFamily.id}});
+    const { loading, error, data, refetch } = useQuery(GET_FAMILY);
     
     
     
