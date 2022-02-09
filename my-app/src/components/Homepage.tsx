@@ -1,17 +1,34 @@
 import React from 'react';
 import MonthlyCalendar from './MonthlyCalendar';
 import SignUp from './Signup';
+import { Link} from 'react-router-dom'
 
-import { Link } from 'react-router-dom'
+interface Props {
+  currentFamily: any
+}
 
-function Homepage(): JSX.Element {
+function Homepage({currentFamily}: Props): JSX.Element {
+
+  const handleLogout = () => {
+    sessionStorage.clear();
+    window.location.reload();
+}
+
   return (
     <section id="hp">
       <h1 id="hp-header">SHARED CALENDAR</h1>
-      <Link className="hp-signup" to="/signup">Sign Up</Link>
-      <Link className="hp-login" to="/login">Login</Link>
-      <Link className="hp-events" to="/events">Events placeholder</Link> 
-      <Link className="month-calendar" to="/month-calendar">Calendar Placeholder</Link>
+      {(currentFamily) ? 
+      <>
+        <p>Logged In</p>
+        <Link className="month-calendar" to="/month-calendar">Calendar Placeholder</Link>
+        <button onClick={handleLogout}>Logout</button>
+
+      </> :
+      <>
+        <Link className="hp-signup" to="/signup">Sign Up</Link>
+        <Link className="hp-login" to="/login">Login</Link>
+      </>
+      }
     </section>
   );
 }

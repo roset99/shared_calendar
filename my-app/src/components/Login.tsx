@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react';
-// import bcrypt from "bcryptjs"
 import { gql, useMutation } from '@apollo/client';        
 
 interface Props {
@@ -20,7 +19,6 @@ function Login({onLoginSetFamily}: Props): any {
     const [login, {data, loading, error}] = useMutation(LOGIN);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [hashed, setHashed] = useState("");
 
     if (loading) return 'Submitting...';
     if (error) return `Submission error! ${error.message}`;
@@ -30,13 +28,15 @@ function Login({onLoginSetFamily}: Props): any {
 
         await login({
             variables: {
-                    email: email,
+                    email: email.toLowerCase(),
                     password: password
             }
-        }).then(
-            (result) => 
-            onLoginSetFamily(result.data.login));
-
+        })
+        .then(
+            (results) => {
+                onLoginSetFamily({id: results.data.login})
+            }
+        )
         navigate("/month-calendar");
     }
 
@@ -46,13 +46,6 @@ function Login({onLoginSetFamily}: Props): any {
     
     const handlePassword = async (e: any) => {
         setPassword(e.target.value);
-        // setHashed(await bcrypt.hash(e.target.value, 12));
-    }
-
-    const handleLogout = () => {
-        sessionStorage.clear()
-        // sessionStorage.removeItem("currentFamily")
-        navigate("/")
     }
 
     return(
@@ -72,7 +65,6 @@ function Login({onLoginSetFamily}: Props): any {
                     <p>Need an account?</p>
                     <Link to="/signup" className="signup-link">Sign up here</Link>
                 </form>
-                    <button onClick={handleLogout}>Logout</button>
         </>
     );
 }

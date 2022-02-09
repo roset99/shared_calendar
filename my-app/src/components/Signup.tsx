@@ -76,7 +76,7 @@ function SignUp({onLoginSetFamily}:any): any {
         await register({ 
             variables: {
                 input: { 
-                    email: email,
+                    email: email.toLowerCase(),
                     password: password
                 }
             } 
@@ -88,9 +88,6 @@ function SignUp({onLoginSetFamily}:any): any {
         
         navigate("/members");
     }
-
-
-
 
     const handleEmail = (e: any) => {
         setEmail(e.target.value);

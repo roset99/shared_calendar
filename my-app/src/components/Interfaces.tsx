@@ -1,7 +1,7 @@
 export interface EventInputInterface {
     title: string,
     family: {},
-    attendees: string[],
+    attendees: any[],
     date: string,
     startTime: string,
     endTime: string

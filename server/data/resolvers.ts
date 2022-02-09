@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { AuthenticationError, UserInputError } from 'apollo-server';
 
+import { AuthenticationError, UserInputError } from 'apollo-server';
 import { Families, People, Events } from './dbConnectors';
 
 // SECRET

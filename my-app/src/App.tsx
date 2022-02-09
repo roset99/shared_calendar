@@ -35,13 +35,19 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-          <Route path="/" element={<Homepage/>} />
+          {(currentFamily) ? 
+          <>
           <Route path="/month-calendar" element={<MonthlyCalendar currentFamily={currentFamily}/>} />
-          <Route path="/signup" element={<SignUp onLoginSetFamily={onLoginSetFamily}/>} />  
-          <Route path="/login" element={<Login onLoginSetFamily={onLoginSetFamily}/>} /> 
-          <Route path="/events" element={<Events/>} /> 
-          <Route path="/days" element={<DailyCalendar/>} /> 
           <Route path="/members" element={<CreatePerson currentFamily={currentFamily} />} />
+          <Route path="/days" element={<DailyCalendar/>} /> 
+          </>
+          :
+          <>
+          <Route path="/login" element={<Login onLoginSetFamily={onLoginSetFamily}/>} /> 
+          <Route path="/signup" element={<SignUp onLoginSetFamily={onLoginSetFamily}/>} />  
+          </>
+          }
+          <Route path="/" element={<Homepage currentFamily={currentFamily}/>} />
       </Routes>
     </BrowserRouter>
   );
