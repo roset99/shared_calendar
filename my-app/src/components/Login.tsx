@@ -34,7 +34,6 @@ function Login({ onLoginSetFamily }: Props): any {
         })
         .then(
             (results) => {
-                console.log (results.data.login);
                 onLoginSetFamily(results.data.login);
             }
         )

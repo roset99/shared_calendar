@@ -12,10 +12,10 @@ import CreatePerson from './components/CreatePerson';
 
 function App() {
 
-  const [currentFamily, setCurrentFamily] = useState(getSessionStorageOrDefault("currentFamily", null));
+  const [currentFamily, setCurrentFamily] = useState<any>(getSessionStorageOrDefault("currentFamily", null));
 
   useEffect(() => {
-    sessionStorage.setItem("currentFamily", JSON.stringify(currentFamily));
+    sessionStorage.setItem("currentFamily", currentFamily);
   }, [currentFamily]);
 
   function getSessionStorageOrDefault(key: string, defaultValue: null) {
@@ -25,7 +25,7 @@ function App() {
       return defaultValue;
     }
 
-    return JSON.parse(stored);
+    return stored;
   }
 
   const onLoginSetFamily = (family: any) : void => { 

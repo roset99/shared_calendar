@@ -13,7 +13,8 @@ const server = new ApolloServer({
     typeDefs, 
     resolvers,
     context: async ({ req }) => {
-        const unverifiedToken = req.headers.authorization?.split('"')[1] || '';
+        // const unverifiedToken = req.headers.authorization?.split(' ')[1] || '';
+        const unverifiedToken = req.headers.authorization || ''; // this line doesn't include Bearer
         let token;
         try {
             token = jwt.verify(unverifiedToken, SECRET);
